@@ -4,28 +4,30 @@
 const I = window.SMIcon;
 
 /* ───────────────── Logo ─────────────────
-   Stylized "SM" mark: a wheat/coffee-bean drop in a circle.
-   Inspired by Sudanese flag stripes (red/white/black/green). */
+   Brand mark (PNG at /logo.png). Mono variants fall back to an SVG
+   re-trace so the brand-guide do/don't examples still render. */
 function SMLogo({ size = 56, mono = false, color }) {
+  if (!mono) {
+    return (
+      <img
+        src="/logo.png"
+        alt="Sudan Mart"
+        width={size}
+        height={size}
+        style={{ display: 'block', objectFit: 'contain' }}
+      />
+    );
+  }
   const c = color || 'var(--primary)';
   return (
     <svg width={size} height={size} viewBox="0 0 80 80">
-      <defs>
-        <linearGradient id={`sm-g-${size}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="var(--green-700)"/>
-          <stop offset="1" stopColor="var(--green-900)"/>
-        </linearGradient>
-      </defs>
-      <circle cx="40" cy="40" r="38" fill={mono ? 'none' : `url(#sm-g-${size})`} stroke={mono ? c : 'none'} strokeWidth="2.5"/>
-      {/* Wheat/spice motif */}
+      <circle cx="40" cy="40" r="38" fill="none" stroke={c} strokeWidth="2.5"/>
       <g transform="translate(40 40)">
-        {/* center stem */}
-        <path d="M0 -22 L0 22" stroke={mono ? c : 'var(--gold-300)'} strokeWidth="2.5" strokeLinecap="round"/>
-        {/* grains */}
+        <path d="M0 -22 L0 22" stroke={c} strokeWidth="2.5" strokeLinecap="round"/>
         {[-16, -8, 0, 8, 16].map((y, i) => (
           <g key={i}>
-            <ellipse cx="-7" cy={y} rx="6" ry="3.5" fill={mono ? c : 'var(--gold-500)'} transform={`rotate(-25 -7 ${y})`} opacity={0.92}/>
-            <ellipse cx="7" cy={y} rx="6" ry="3.5" fill={mono ? c : 'var(--gold-500)'} transform={`rotate(25 7 ${y})`} opacity={0.92}/>
+            <ellipse cx="-7" cy={y} rx="6" ry="3.5" fill={c} transform={`rotate(-25 -7 ${y})`} opacity={0.92}/>
+            <ellipse cx="7" cy={y} rx="6" ry="3.5" fill={c} transform={`rotate(25 7 ${y})`} opacity={0.92}/>
           </g>
         ))}
       </g>

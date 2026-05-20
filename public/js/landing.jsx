@@ -16,7 +16,7 @@ function Landing() {
       <TopNav scrolled={scrolled}/>
       <Hero/>
       <TrustStrip/>
-      <Features/>
+      <Story/>
       <Categories/>
       <HowItWorks/>
       <AppShowcase/>
@@ -46,7 +46,7 @@ function TopNav({ scrolled }) {
           <SMLogo size={40}/>
           <div className="l-brand-text">
             <div className="l-brand-ar">سودان مارت</div>
-            <div className="l-brand-en">SUDAN MART · KSA</div>
+            <div className="l-brand-en">S U D A N · M A R T</div>
           </div>
         </div>
         <nav className="l-nav-links">
@@ -56,7 +56,6 @@ function TopNav({ scrolled }) {
         </nav>
         <div className="l-nav-cta">
           <a className="l-link-en">EN</a>
-          <a className="l-btn l-btn-ghost" href="#download">تسجيل دخول</a>
           <a className="l-btn l-btn-primary" href="#download">حمّل التطبيق <I.download size={16} stroke="currentColor"/></a>
         </div>
       </div>
@@ -92,11 +91,11 @@ function Hero() {
             متوفر الآن في المملكة العربية السعودية
           </div>
           <h1 className="l-hero-title">
-            أصالة سودانية،<br/>
-            <span className="l-accent">إلى باب بيتك</span> في المملكة.
+            أصالة <span className="l-script">سودانية</span>،<br/>
+            إلى باب بيتك في <span className="l-script">المملكة</span>.
           </h1>
           <p className="l-hero-sub">
-            تطبيق متكامل يجمع لك أفضل المنتجات السودانية من البن وبهارات أم درمان إلى العطور والتمور والأقمشة — مباشرة من المزارع والحرفيين، مع توصيل سريع لجميع مدن المملكة.
+            الأصالة وعد، والجودة قسم، والسرعة احترام. نحن لسنا متجراً، نحن جسرٌ بين مزارع كردفان وسوق أم درمان، وبين بيتك في الرياض، جدة، الدمام.
           </p>
 
           <div className="l-hero-cta">
@@ -341,28 +340,49 @@ function TrustStrip() {
 }
 
 /* ───────── Features ───────── */
-function Features() {
-  const items = [
-    { ic: I.shield, ar: 'أصلية ١٠٠٪', sub: 'كل المنتجات معتمدة، مع ضمان استرداد كامل خلال ١٤ يوم.', accent: 'var(--primary)' },
-    { ic: I.truck,  ar: 'توصيل لكل المملكة', sub: 'الرياض، جدة، الدمام، مكة، المدينة وأكثر — خلال ٢٤ — ٤٨ ساعة.', accent: 'var(--terra-600)' },
-    { ic: I.basket, ar: 'مباشر من المصدر', sub: 'من مزارع كردفان وحرفيي أم درمان بدون وسطاء، بأفضل سعر.', accent: 'var(--gold-700)' },
-    { ic: I.card,   ar: 'دفع مرن وآمن', sub: 'مدى، فيزا، أبل باي، tabby وtamara — اشتر الآن وادفع لاحقاً.', accent: 'var(--green-500)' },
+function Story() {
+  const pillars = [
+    { num: '٠١', ar: 'الأصالة', en: 'AUTHENTICITY', sub: 'كل منتج له منشأ موثق وقصة حقيقية.', color: 'var(--primary)' },
+    { num: '٠٢', ar: 'الحرفية', en: 'CRAFT',        sub: 'نكرّم الأيدي التي صنعت وعشقت ما صنعت.', color: 'var(--gold-700)' },
+    { num: '٠٣', ar: 'السرعة',  en: 'SPEED',        sub: 'وقتك أمانة — توصيل خلال ٢٤–٤٨ ساعة.', color: 'var(--terra-600)' },
+  ];
+  const mvv = [
+    { lbl: 'الرسالة · MISSION', body: 'أن نوصل أصالة السودان إلى كل بيت سعودي بسرعة، وأمان، وكرامة للحرفي.' },
+    { lbl: 'الرؤية · VISION',   body: 'أن نكون الجسر الرقمي الأول للمنتجات السودانية في الخليج العربي بحلول ٢٠٢٨.' },
+    { lbl: 'القيم · VALUES',    body: 'الأصالة · الحرفية · السرعة · الشفافية · الكرامة. خمس قيم نمتحن بها كل قرار.' },
   ];
   return (
-    <section className="l-section">
-      <div className="l-container">
-        <SectionHead eyebrow="WHY SUDAN MART" ar="لماذا سودان مارت؟" sub="منصة واحدة، آلاف المنتجات السودانية الأصيلة، تجربة مصممة خصيصاً للعميل السعودي."/>
-        <div className="l-feat-grid">
-          {items.map((it, i) => (
-            <div key={i} className="l-feat">
-              <div className="l-feat-icon" style={{ background: `color-mix(in oklab, ${it.accent} 14%, transparent)`, color: it.accent }}>
-                <it.ic size={26} stroke={it.accent}/>
-              </div>
-              <div className="l-feat-title">{it.ar}</div>
-              <div className="l-feat-sub">{it.sub}</div>
-            </div>
-          ))}
+    <section id="story" className="l-section">
+      <div className="l-container l-story-grid">
+        <div>
+          <div className="l-eyebrow"><span className="l-eyebrow-dot"></span>حكايتنا · OUR STORY</div>
+          <h2 className="l-h2">من الأرض السودانية،<br/>إلى البيت <span className="l-script">السعودي</span>.</h2>
         </div>
+        <div className="l-story-body">
+          <p>وُلِدت سودان مارت من حنين بسيط: أن يجد ابن السودان في الغربة طعم بيته، عطر بلاده، ولمسة من يدِ حرفي يعرفه.</p>
+          <p>نحن لسنا متجراً إلكترونياً، نحن جسرٌ بين مزارع كردفان وحوش بيت في الرياض، بين سوق أم درمان وعطر دلكة في جدة. نختار. نحفظ. نوصل.</p>
+          <p className="l-story-pledge">الأصالة وعد، والجودة قسم، والسرعة احترام.</p>
+        </div>
+      </div>
+
+      <div className="l-container l-pillars">
+        {pillars.map(p => (
+          <div key={p.en} className="l-pillar">
+            <div className="l-pillar-num" style={{ color: p.color }}>{p.num}</div>
+            <div className="l-pillar-en">{p.en}</div>
+            <div className="l-pillar-ar">{p.ar}</div>
+            <div className="l-pillar-sub">{p.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="l-container l-mvv">
+        {mvv.map(x => (
+          <div key={x.lbl} className="l-mvv-card">
+            <div className="l-mvv-l">{x.lbl}</div>
+            <div className="l-mvv-b">{x.body}</div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -731,7 +751,7 @@ function Footer() {
             <SMLogo size={44}/>
             <div className="l-brand-text">
               <div className="l-brand-ar" style={{ color: '#fff' }}>سودان مارت</div>
-              <div className="l-brand-en">SUDAN MART · KSA</div>
+              <div className="l-brand-en">S U D A N · M A R T</div>
             </div>
           </div>
           <p className="l-footer-tag">منصة سعودية لتوصيل أصالة المنتجات السودانية إلى كل بيت في المملكة.</p>
@@ -755,11 +775,6 @@ function Footer() {
       <div className="l-footer-bottom">
         <div className="l-container l-footer-bottom-inner">
           <div>© ٢٠٢٦ سودان مارت · جميع الحقوق محفوظة</div>
-          <div className="l-footer-meta">
-            <span>سجل تجاري: ١٠١٠٤٥٦٧٨٩</span>
-            <span>·</span>
-            <span>الرقم الضريبي: ٣٠٠١٢٣٤٥٦٧٨٠٠٠٣</span>
-          </div>
         </div>
       </div>
     </footer>

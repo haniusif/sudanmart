@@ -1,4 +1,4 @@
-name: Deploy SudanMart to VPS
+name: 🚀 Deploy SudanMart App
 
 on:
   push:
@@ -10,19 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to VPS via SSH
+      - name: 🚀 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
 
+            echo "🚀 Starting deployment..."
+
             cd /var/www/sudanmart
+
+            git config --global --add safe.directory /var/www/sudanmart
 
             echo "Pulling latest code..."
             git pull origin main
@@ -30,13 +31,19 @@ jobs:
             echo "Installing dependencies..."
             composer install --no-dev --optimize-autoloader
 
-            echo "Running Laravel commands..."
+            echo "Running migrations..."
             php artisan migrate --force || true
+
+            echo "Clearing caches..."
+            php artisan config:clear
+            php artisan cache:clear
+
+            echo "Rebuilding caches..."
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
-            echo "Fix permissions..."
+            echo "Fixing permissions..."
             chown -R www-data:www-data /var/www/sudanmart
 
-            echo "Deployment complete"
+            echo "✅ Deployment complete"

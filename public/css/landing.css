@@ -1,5 +1,5 @@
 /* Sudan Mart — Landing page styles */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -566,3 +566,21 @@ body {
   .l-pillars { grid-template-columns: 1fr; }
   .l-mvv     { grid-template-columns: 1fr; }
 }
+
+/* ─────────── EN (LTR) tweaks ─────────── */
+.landing-en { font-family: 'Inter', 'Tajawal', system-ui, -apple-system, sans-serif; }
+.landing-en .l-brand-ar { letter-spacing: -0.2px; }
+.landing-en .l-script { font-style: italic; }
+.landing-en .l-hero-title,
+.landing-en .l-h2,
+.landing-en .l-sec-title,
+.landing-en .l-sellers-title,
+.landing-en .l-download-title { letter-spacing: -1px; line-height: 1.05; }
+.landing-en .l-pillar-ar,
+.landing-en .l-pillar-en { letter-spacing: 0; }
+.landing-en .l-pillar-ar { font-size: 22px; }
+.landing-en .l-eyebrow,
+.landing-en .l-pillar-en,
+.landing-en .l-mvv-l,
+.landing-en .l-cat-en { letter-spacing: 2px; }
+.landing-en .l-link-en { font-family: inherit; }

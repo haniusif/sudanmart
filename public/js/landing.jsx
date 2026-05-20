@@ -1,9 +1,22 @@
 // Sudan Mart — Marketing Landing Page (KSA)
 const I = window.SMIcon;
 
+const LangContext = React.createContext('ar');
+const useLang = () => React.useContext(LangContext);
+const tr = (lang, ar, en) => lang === 'ar' ? ar : en;
+
 function Landing() {
   const [navOpen, setNavOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const [lang, setLang] = React.useState(() => {
+    try { return localStorage.getItem('sm.lang') || 'ar'; } catch { return 'ar'; }
+  });
+
+  React.useEffect(() => {
+    try { localStorage.setItem('sm.lang', lang); } catch {}
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }, [lang]);
 
   React.useEffect(() => {
     const h = () => setScrolled(window.scrollY > 12);
@@ -11,9 +24,12 @@ function Landing() {
     return () => window.removeEventListener('scroll', h);
   }, []);
 
+  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+
   return (
-    <div className="landing" dir="rtl">
-      <TopNav scrolled={scrolled}/>
+    <LangContext.Provider value={lang}>
+    <div className={`landing landing-${lang}`} dir={dir}>
+      <TopNav scrolled={scrolled} lang={lang} setLang={setLang}/>
       <Hero/>
       <TrustStrip/>
       <Story/>
@@ -27,36 +43,40 @@ function Landing() {
       <DownloadCta/>
       <Footer/>
     </div>
+    </LangContext.Provider>
   );
 }
 
 /* ───────── Nav ───────── */
-function TopNav({ scrolled }) {
+function TopNav({ scrolled, lang, setLang }) {
   const links = [
     { ar: 'الرئيسية',     en: 'Home' },
     { ar: 'كيف نعمل',     en: 'How it works' },
     { ar: 'الأقسام',     en: 'Categories' },
-    { ar: 'للبائعين',    en: 'Sellers' },
+    { ar: 'للبائعين',    en: 'For sellers' },
     { ar: 'الأسئلة الشائعة', en: 'FAQ' },
   ];
+  const getApp = tr(lang, 'حمّل التطبيق', 'Get the app');
+  const toggleLabel = lang === 'ar' ? 'EN' : 'AR';
+  const brandAr = tr(lang, 'سودان مارت', 'Sudan Mart');
   return (
     <header className={`l-nav ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="l-container l-nav-inner">
         <div className="l-brand">
           <SMLogo size={40}/>
           <div className="l-brand-text">
-            <div className="l-brand-ar">سودان مارت</div>
+            <div className="l-brand-ar">{brandAr}</div>
             <div className="l-brand-en">S U D A N · M A R T</div>
           </div>
         </div>
         <nav className="l-nav-links">
           {links.map((l, i) => (
-            <a key={i} href={`#${['hero','how','cats','sellers','faq'][i]}`}>{l.ar}</a>
+            <a key={i} href={`#${['hero','how','cats','sellers','faq'][i]}`}>{lang === 'ar' ? l.ar : l.en}</a>
           ))}
         </nav>
         <div className="l-nav-cta">
-          <a className="l-link-en">EN</a>
-          <a className="l-btn l-btn-primary" href="#download">حمّل التطبيق <I.download size={16} stroke="currentColor"/></a>
+          <a className="l-link-en" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} style={{ cursor: 'pointer' }}>{toggleLabel}</a>
+          <a className="l-btn l-btn-primary" href="#download">{getApp} <I.download size={16} stroke="currentColor"/></a>
         </div>
       </div>
     </header>
@@ -65,6 +85,28 @@ function TopNav({ scrolled }) {
 
 /* ───────── Hero ───────── */
 function Hero() {
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    eyebrow: 'متوفر الآن في المملكة العربية السعودية',
+    title: <>أصالة <span className="l-script">سودانية</span>،<br/>إلى باب بيتك في <span className="l-script">المملكة</span>.</>,
+    sub: 'الأصالة وعد، والجودة قسم، والسرعة احترام. نحن لسنا متجراً، نحن جسرٌ بين مزارع كردفان وسوق أم درمان، وبين بيتك في الرياض، جدة، الدمام.',
+    getOn: 'احصل عليه من', downloadOn: 'حمّله من',
+    users: '+٢٤٬٠٠٠', usersLbl: 'مستخدم سعودي يثق بنا',
+    rating: '٤٫٩', ratingOf: '/ ٥', ratingLbl: 'تقييم على المتاجر',
+    float1T: 'شُحنت اليوم',    float1S: 'يصل غداً قبل ٦ مساءً',
+    float2T: 'دفع آمن',         float2S: 'مدى · فيزا · أبل باي',
+    float3T: 'عروض رمضان',     float3S: 'حتى ٤٠٪ خصم',
+  } : {
+    eyebrow: 'Now available across Saudi Arabia',
+    title: <><span className="l-script">Sudanese</span> authenticity,<br/>at your <span className="l-script">doorstep</span> in KSA.</>,
+    sub: 'Authenticity is a promise, quality an oath, speed a sign of respect. We are not a store — we are a bridge between Kordofan farms, Omdurman markets, and your home in Riyadh, Jeddah, Dammam.',
+    getOn: 'Get it on', downloadOn: 'Download on the',
+    users: '+24,000', usersLbl: 'Saudi users trust us',
+    rating: '4.9', ratingOf: '/ 5', ratingLbl: 'App store rating',
+    float1T: 'Shipped today',    float1S: 'Arrives tomorrow before 6 PM',
+    float2T: 'Secure checkout',  float2S: 'mada · Visa · Apple Pay',
+    float3T: 'Ramadan deals',    float3S: 'Up to 40% off',
+  };
   return (
     <section id="hero" className="l-hero">
       {/* bg layers */}
@@ -88,28 +130,23 @@ function Hero() {
         <div className="l-hero-copy">
           <div className="l-eyebrow">
             <span className="l-eyebrow-dot"></span>
-            متوفر الآن في المملكة العربية السعودية
+            {t.eyebrow}
           </div>
-          <h1 className="l-hero-title">
-            أصالة <span className="l-script">سودانية</span>،<br/>
-            إلى باب بيتك في <span className="l-script">المملكة</span>.
-          </h1>
-          <p className="l-hero-sub">
-            الأصالة وعد، والجودة قسم، والسرعة احترام. نحن لسنا متجراً، نحن جسرٌ بين مزارع كردفان وسوق أم درمان، وبين بيتك في الرياض، جدة، الدمام.
-          </p>
+          <h1 className="l-hero-title">{t.title}</h1>
+          <p className="l-hero-sub">{t.sub}</p>
 
           <div className="l-hero-cta">
             <a href="#download" className="l-store l-store-google">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M3 3l18 9-18 9zM3 3v18M3 3l13 9-13 9" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>
               <div>
-                <div className="l-store-small">احصل عليه من</div>
+                <div className="l-store-small">{t.getOn}</div>
                 <div className="l-store-big">Google Play</div>
               </div>
             </a>
             <a href="#download" className="l-store l-store-apple">
               <I.apple size={22} stroke="currentColor"/>
               <div>
-                <div className="l-store-small">حمّله من</div>
+                <div className="l-store-small">{t.downloadOn}</div>
                 <div className="l-store-big">App Store</div>
               </div>
             </a>
@@ -119,11 +156,11 @@ function Hero() {
           <div className="l-hero-meta">
             <div className="l-stack">
               <div className="l-stack-avatars">
-                {['أ','م','س','ن'].map((c, i) => <div key={i} className="l-avi" style={{ background: ['#0F4D3A','#A98232','#8E3A22','#14654C'][i] }}>{c}</div>)}
+                {(lang === 'ar' ? ['أ','م','س','ن'] : ['A','M','S','N']).map((c, i) => <div key={i} className="l-avi" style={{ background: ['#0F4D3A','#A98232','#8E3A22','#14654C'][i] }}>{c}</div>)}
               </div>
               <div>
-                <div className="l-stack-num">+٢٤٬٠٠٠</div>
-                <div className="l-stack-lbl">مستخدم سعودي يثق بنا</div>
+                <div className="l-stack-num">{t.users}</div>
+                <div className="l-stack-lbl">{t.usersLbl}</div>
               </div>
             </div>
             <div className="l-stack">
@@ -131,8 +168,8 @@ function Hero() {
                 {[1,2,3,4,5].map(i => <I.star key={i} size={16}/>)}
               </div>
               <div>
-                <div className="l-stack-num">٤٫٩ <span className="l-stack-of">/ ٥</span></div>
-                <div className="l-stack-lbl">تقييم على المتاجر</div>
+                <div className="l-stack-num">{t.rating} <span className="l-stack-of">{t.ratingOf}</span></div>
+                <div className="l-stack-lbl">{t.ratingLbl}</div>
               </div>
             </div>
           </div>
@@ -148,15 +185,15 @@ function Hero() {
           <div className="l-float l-float-1">
             <div className="l-float-ic" style={{ background: '#C95A2F' }}><I.truck size={18} stroke="#fff"/></div>
             <div>
-              <div className="l-float-title">شُحنت اليوم</div>
-              <div className="l-float-sub">يصل غداً قبل ٦ مساءً</div>
+              <div className="l-float-title">{t.float1T}</div>
+              <div className="l-float-sub">{t.float1S}</div>
             </div>
           </div>
           <div className="l-float l-float-2">
             <I.shield size={18} stroke="var(--success)"/>
             <div>
-              <div className="l-float-title">دفع آمن</div>
-              <div className="l-float-sub">مدى · فيزا · أبل باي</div>
+              <div className="l-float-title">{t.float2T}</div>
+              <div className="l-float-sub">{t.float2S}</div>
             </div>
           </div>
           <div className="l-float l-float-3">
@@ -164,8 +201,8 @@ function Hero() {
               <span style={{ fontWeight: 800, color: '#2a1f08' }}>%</span>
             </div>
             <div>
-              <div className="l-float-title">عروض رمضان</div>
-              <div className="l-float-sub">حتى ٤٠٪ خصم</div>
+              <div className="l-float-title">{t.float3T}</div>
+              <div className="l-float-sub">{t.float3S}</div>
             </div>
           </div>
         </div>
@@ -317,22 +354,20 @@ function MiniProduct() {
 
 /* ───────── Trust strip ───────── */
 function TrustStrip() {
-  const items = [
-    'سمسا · SMSA',
-    'البريد السعودي',
-    'مدى',
-    'فيزا · Visa',
-    'ماستركارد · Mastercard',
-    'Apple Pay',
-    'tabby',
-    'tamara',
+  const lang = useLang();
+  const label = tr(lang, 'شركاء الشحن والدفع في المملكة', 'Shipping & payment partners in KSA');
+  const items = lang === 'ar' ? [
+    'سمسا · SMSA', 'البريد السعودي', 'مدى',
+    'فيزا · Visa', 'ماستركارد · Mastercard', 'Apple Pay', 'tabby', 'tamara',
+  ] : [
+    'SMSA', 'Saudi Post', 'mada', 'Visa', 'Mastercard', 'Apple Pay', 'tabby', 'tamara',
   ];
   return (
     <section className="l-trust">
       <div className="l-container">
-        <div className="l-trust-label">شركاء الشحن والدفع في المملكة</div>
+        <div className="l-trust-label">{label}</div>
         <div className="l-trust-row">
-          {items.map(t => <div key={t} className="l-trust-item">{t}</div>)}
+          {items.map(it => <div key={it} className="l-trust-item">{it}</div>)}
         </div>
       </div>
     </section>
@@ -341,43 +376,67 @@ function TrustStrip() {
 
 /* ───────── Features ───────── */
 function Story() {
-  const pillars = [
-    { num: '٠١', ar: 'الأصالة', en: 'AUTHENTICITY', sub: 'كل منتج له منشأ موثق وقصة حقيقية.', color: 'var(--primary)' },
-    { num: '٠٢', ar: 'الحرفية', en: 'CRAFT',        sub: 'نكرّم الأيدي التي صنعت وعشقت ما صنعت.', color: 'var(--gold-700)' },
-    { num: '٠٣', ar: 'السرعة',  en: 'SPEED',        sub: 'وقتك أمانة — توصيل خلال ٢٤–٤٨ ساعة.', color: 'var(--terra-600)' },
-  ];
-  const mvv = [
-    { lbl: 'الرسالة · MISSION', body: 'أن نوصل أصالة السودان إلى كل بيت سعودي بسرعة، وأمان، وكرامة للحرفي.' },
-    { lbl: 'الرؤية · VISION',   body: 'أن نكون الجسر الرقمي الأول للمنتجات السودانية في الخليج العربي بحلول ٢٠٢٨.' },
-    { lbl: 'القيم · VALUES',    body: 'الأصالة · الحرفية · السرعة · الشفافية · الكرامة. خمس قيم نمتحن بها كل قرار.' },
-  ];
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    eyebrow: 'حكايتنا · OUR STORY',
+    title: <>من الأرض السودانية،<br/>إلى البيت <span className="l-script">السعودي</span>.</>,
+    p1: 'وُلِدت سودان مارت من حنين بسيط: أن يجد ابن السودان في الغربة طعم بيته، عطر بلاده، ولمسة من يدِ حرفي يعرفه.',
+    p2: 'نحن لسنا متجراً إلكترونياً، نحن جسرٌ بين مزارع كردفان وحوش بيت في الرياض، بين سوق أم درمان وعطر دلكة في جدة. نختار. نحفظ. نوصل.',
+    pledge: 'الأصالة وعد، والجودة قسم، والسرعة احترام.',
+    pillars: [
+      { num: '٠١', name: 'الأصالة', en: 'AUTHENTICITY', sub: 'كل منتج له منشأ موثق وقصة حقيقية.', color: 'var(--primary)' },
+      { num: '٠٢', name: 'الحرفية', en: 'CRAFT',        sub: 'نكرّم الأيدي التي صنعت وعشقت ما صنعت.', color: 'var(--gold-700)' },
+      { num: '٠٣', name: 'السرعة',  en: 'SPEED',        sub: 'وقتك أمانة — توصيل خلال ٢٤–٤٨ ساعة.', color: 'var(--terra-600)' },
+    ],
+    mvv: [
+      { lbl: 'الرسالة · MISSION', body: 'أن نوصل أصالة السودان إلى كل بيت سعودي بسرعة، وأمان، وكرامة للحرفي.' },
+      { lbl: 'الرؤية · VISION',   body: 'أن نكون الجسر الرقمي الأول للمنتجات السودانية في الخليج العربي بحلول ٢٠٢٨.' },
+      { lbl: 'القيم · VALUES',    body: 'الأصالة · الحرفية · السرعة · الشفافية · الكرامة. خمس قيم نمتحن بها كل قرار.' },
+    ],
+  } : {
+    eyebrow: 'OUR STORY · حكايتنا',
+    title: <>From Sudanese soil,<br/>to your <span className="l-script">Saudi</span> home.</>,
+    p1: 'Sudan Mart was born from a simple longing: that a Sudanese expat finds the taste of home, the scent of their land, and the touch of a familiar craftsman.',
+    p2: 'We are not an online store — we are a bridge between Kordofan farms and a courtyard in Riyadh, between Omdurman markets and dilka perfume in Jeddah. We curate. We preserve. We deliver.',
+    pledge: 'Authenticity is a promise. Quality is an oath. Speed is respect.',
+    pillars: [
+      { num: '01', name: 'Authenticity', en: 'AUTHENTICITY', sub: 'Every product has documented origin and a real story.', color: 'var(--primary)' },
+      { num: '02', name: 'Craft',        en: 'CRAFT',        sub: 'We honour the hands that made — and loved what they made.', color: 'var(--gold-700)' },
+      { num: '03', name: 'Speed',        en: 'SPEED',        sub: 'Your time is a trust — delivered within 24–48 hours.', color: 'var(--terra-600)' },
+    ],
+    mvv: [
+      { lbl: 'MISSION · الرسالة', body: 'To bring Sudanese authenticity to every Saudi home — quickly, safely, and with dignity for the craftsman.' },
+      { lbl: 'VISION · الرؤية',   body: 'To be the leading digital bridge for Sudanese products across the Gulf by 2028.' },
+      { lbl: 'VALUES · القيم',    body: 'Authenticity · Craft · Speed · Transparency · Dignity. Five values we measure every decision against.' },
+    ],
+  };
   return (
     <section id="story" className="l-section">
       <div className="l-container l-story-grid">
         <div>
-          <div className="l-eyebrow"><span className="l-eyebrow-dot"></span>حكايتنا · OUR STORY</div>
-          <h2 className="l-h2">من الأرض السودانية،<br/>إلى البيت <span className="l-script">السعودي</span>.</h2>
+          <div className="l-eyebrow"><span className="l-eyebrow-dot"></span>{t.eyebrow}</div>
+          <h2 className="l-h2">{t.title}</h2>
         </div>
         <div className="l-story-body">
-          <p>وُلِدت سودان مارت من حنين بسيط: أن يجد ابن السودان في الغربة طعم بيته، عطر بلاده، ولمسة من يدِ حرفي يعرفه.</p>
-          <p>نحن لسنا متجراً إلكترونياً، نحن جسرٌ بين مزارع كردفان وحوش بيت في الرياض، بين سوق أم درمان وعطر دلكة في جدة. نختار. نحفظ. نوصل.</p>
-          <p className="l-story-pledge">الأصالة وعد، والجودة قسم، والسرعة احترام.</p>
+          <p>{t.p1}</p>
+          <p>{t.p2}</p>
+          <p className="l-story-pledge">{t.pledge}</p>
         </div>
       </div>
 
       <div className="l-container l-pillars">
-        {pillars.map(p => (
+        {t.pillars.map(p => (
           <div key={p.en} className="l-pillar">
             <div className="l-pillar-num" style={{ color: p.color }}>{p.num}</div>
             <div className="l-pillar-en">{p.en}</div>
-            <div className="l-pillar-ar">{p.ar}</div>
+            <div className="l-pillar-ar">{p.name}</div>
             <div className="l-pillar-sub">{p.sub}</div>
           </div>
         ))}
       </div>
 
       <div className="l-container l-mvv">
-        {mvv.map(x => (
+        {t.mvv.map(x => (
           <div key={x.lbl} className="l-mvv-card">
             <div className="l-mvv-l">{x.lbl}</div>
             <div className="l-mvv-b">{x.body}</div>
@@ -390,20 +449,24 @@ function Story() {
 
 /* ───────── Categories preview ───────── */
 function Categories() {
+  const lang = useLang();
+  const head = lang === 'ar'
+    ? { title: 'أقسام تروي حكاية السودان', sub: 'من البن المُحمَّص في حلة الجبنة إلى عطور وبخور التلقاي، اختر ما تشتاق إليه.', link: 'تصفح القسم', count: (n) => `${n} منتج` }
+    : { title: "Categories that tell Sudan's story", sub: 'From coffee roasted in a jebena to talqai incense and oud — choose what you long for.', link: 'Browse category', count: (n) => `${n} products` };
   return (
     <section id="cats" className="l-section l-section-tinted">
       <div className="l-container">
-        <SectionHead eyebrow="CATEGORIES" ar="أقسام تروي حكاية السودان" sub="من البن المُحمَّص في حلة الجبنة إلى عطور وبخور التلقاي، اختر ما تشتاق إليه."/>
+        <SectionHead eyebrow="CATEGORIES" ar={head.title} sub={head.sub}/>
         <div className="l-cat-grid">
           {CATEGORIES.slice(0, 6).map((c, i) => (
             <a key={c.id} className="l-cat" style={{ background: CAT_COLORS[c.cat].bg, color: CAT_COLORS[c.cat].ink, gridArea: ['a','b','c','d','e','f'][i] }}>
               <div className="l-cat-en">{c.en}</div>
-              <div className="l-cat-ar">{c.ar}</div>
-              <div className="l-cat-count">{c.count} منتج</div>
+              <div className="l-cat-ar">{lang === 'ar' ? c.ar : c.en}</div>
+              <div className="l-cat-count">{head.count(c.count)}</div>
               <div className="l-cat-glyph">
                 <Glyph kind={CAT_COLORS[c.cat].glyph} color={CAT_COLORS[c.cat].ink} size={180}/>
               </div>
-              <div className="l-cat-link">تصفح القسم <I.forward size={14} stroke="currentColor"/></div>
+              <div className="l-cat-link">{head.link} <I.forward size={14} stroke="currentColor"/></div>
             </a>
           ))}
         </div>
@@ -414,21 +477,32 @@ function Categories() {
 
 /* ───────── How it works ───────── */
 function HowItWorks() {
-  const steps = [
-    { n: '٠١', ar: 'اختر منتجاتك', sub: 'تصفّح آلاف المنتجات السودانية في أكثر من ١٢ قسم.', ic: I.search },
-    { n: '٠٢', ar: 'ادفع بأمان', sub: 'مدى، فيزا، أبل باي، أو tabby/tamara — اقسّط أو ادفع كاملاً.', ic: I.card },
-    { n: '٠٣', ar: 'استلم بسرعة', sub: 'توصيل خلال ٢٤–٤٨ ساعة لجميع مدن المملكة الرئيسية.', ic: I.truck },
-  ];
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    title: '٣ خطوات لطلبك', sub: 'من التصفح إلى باب البيت، تجربة سلسة بدون تعقيد.',
+    steps: [
+      { n: '٠١', title: 'اختر منتجاتك', sub: 'تصفّح آلاف المنتجات السودانية في أكثر من ١٢ قسم.', ic: I.search },
+      { n: '٠٢', title: 'ادفع بأمان', sub: 'مدى، فيزا، أبل باي، أو tabby/tamara — اقسّط أو ادفع كاملاً.', ic: I.card },
+      { n: '٠٣', title: 'استلم بسرعة', sub: 'توصيل خلال ٢٤–٤٨ ساعة لجميع مدن المملكة الرئيسية.', ic: I.truck },
+    ],
+  } : {
+    title: '3 steps to your order', sub: 'From browsing to your doorstep — smooth, no friction.',
+    steps: [
+      { n: '01', title: 'Pick your items', sub: 'Browse thousands of Sudanese products across 12+ categories.', ic: I.search },
+      { n: '02', title: 'Pay securely',    sub: 'mada, Visa, Apple Pay, tabby or tamara — pay in full or in installments.', ic: I.card },
+      { n: '03', title: 'Receive fast',    sub: 'Delivered in 24–48 hours to all major Saudi cities.', ic: I.truck },
+    ],
+  };
   return (
     <section id="how" className="l-section">
       <div className="l-container">
-        <SectionHead eyebrow="HOW IT WORKS" ar="٣ خطوات لطلبك" sub="من التصفح إلى باب البيت، تجربة سلسة بدون تعقيد."/>
+        <SectionHead eyebrow="HOW IT WORKS" ar={t.title} sub={t.sub}/>
         <div className="l-how-grid">
-          {steps.map((s, i) => (
+          {t.steps.map((s, i) => (
             <div key={i} className="l-how">
               <div className="l-how-num">{s.n}</div>
               <div className="l-how-icon"><s.ic size={26} stroke="var(--primary)"/></div>
-              <div className="l-how-title">{s.ar}</div>
+              <div className="l-how-title">{s.title}</div>
               <div className="l-how-sub">{s.sub}</div>
               {i < 2 && <div className="l-how-arrow">
                 <svg viewBox="0 0 60 12" width="60" height="12"><path d="M0 6h54M48 1l6 5-6 5" fill="none" stroke="var(--text-4)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -443,24 +517,39 @@ function HowItWorks() {
 
 /* ───────── App showcase ───────── */
 function AppShowcase() {
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    title: 'تجربة تسوّق على راحتك',
+    sub: 'واجهة عربية أولاً، تصميم نظيف، وأداء فائق — مصمم خصيصاً لعملاء المملكة.',
+    cards: [
+      { title: 'سلة ذكية', sub: 'إضافة سريعة، خصومات تلقائية، وكوبونات مستحقة.' },
+      { title: 'تتبع لحظي', sub: 'تابع طلبك من التجهيز إلى التسليم على الخريطة.' },
+      { title: 'مفضّلات', sub: 'احفظ ما يعجبك ورجّع له لاحقاً، أو شاركه مع العائلة.' },
+    ],
+  } : {
+    title: 'Shopping built around you',
+    sub: 'Arabic-first interface, clean design, fast performance — built for Saudi customers.',
+    cards: [
+      { title: 'Smart cart',    sub: 'Quick add, automatic discounts, and earned coupons.' },
+      { title: 'Live tracking', sub: 'Watch your order from packing to handoff, live on a map.' },
+      { title: 'Favorites',     sub: 'Save what you love, come back later, or share with family.' },
+    ],
+  };
+  const screens = [<MiniHome/>, <MiniCategories/>, <MiniProduct/>];
   return (
     <section className="l-section l-showcase">
       <div className="l-container">
-        <SectionHead eyebrow="THE APP" ar="تجربة تسوّق على راحتك" sub="واجهة عربية أولاً، تصميم نظيف، وأداء فائق — مصمم خصيصاً لعملاء المملكة."/>
+        <SectionHead eyebrow="THE APP" ar={t.title} sub={t.sub}/>
         <div className="l-showcase-row">
-          {[
-            { ar: 'سلة ذكية', sub: 'إضافة سريعة، خصومات تلقائية، وكوبونات مستحقة.', screen: <MiniHome/> },
-            { ar: 'تتبع لحظي', sub: 'تابع طلبك من التجهيز إلى التسليم على الخريطة.', screen: <MiniCategories/> },
-            { ar: 'مفضّلات', sub: 'احفظ ما يعجبك ورجّع له لاحقاً، أو شاركه مع العائلة.', screen: <MiniProduct/> },
-          ].map((s, i) => (
+          {t.cards.map((s, i) => (
             <div key={i} className="l-showcase-card">
               <div className="l-showcase-phone">
                 <div className="l-mini-frame">
                   <div className="l-mini-notch"></div>
-                  <div className="l-mini-screen">{s.screen}</div>
+                  <div className="l-mini-screen">{screens[i]}</div>
                 </div>
               </div>
-              <div className="l-showcase-title">{s.ar}</div>
+              <div className="l-showcase-title">{s.title}</div>
               <div className="l-showcase-sub">{s.sub}</div>
             </div>
           ))}
@@ -472,30 +561,50 @@ function AppShowcase() {
 
 /* ───────── Sellers ───────── */
 function Sellers() {
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    eyebrow: 'للبائعين والحرفيين',
+    title: <>بضاعتك السودانية،<br/><span className="l-accent">سوق سعودي يقدّرها.</span></>,
+    sub: 'افتح متجرك الإلكتروني في دقائق، أوصل منتجاتك لآلاف العملاء في كل مدن المملكة، ودع سودان مارت يتكفّل بالشحن والدفع والدعم.',
+    list: ['عمولة منخفضة وشفافة', 'أدوات إدارة كاملة من جوالك', 'دعم تسويقي وحملات إعلانية', 'دفعات أسبوعية إلى حسابك البنكي'],
+    cta1: 'سجّل بائعاً', cta2: 'تعرّف أكثر',
+    sideLinks: ['الرئيسية','الطلبات','المنتجات','العملاء'],
+    kpis: [
+      { l: 'مبيعات اليوم', v: '٤٢٬٣٨٠', u: 'ر.س', c: '#0F4D3A' },
+      { l: 'طلبات',       v: '٢٤٧',    c: '#A98232' },
+      { l: 'عملاء جدد',   v: '٤٢',     c: '#B0492C' },
+    ],
+    chartTitle: 'إيرادات الأسبوع',
+  } : {
+    eyebrow: 'For sellers & artisans',
+    title: <>Your Sudanese goods,<br/><span className="l-accent">a Saudi market that values them.</span></>,
+    sub: 'Open your online store in minutes, reach thousands of customers across the Kingdom, and let Sudan Mart handle shipping, payments, and support.',
+    list: ['Low, transparent commission', 'Full management tools from your phone', 'Marketing & ad campaign support', 'Weekly payouts to your bank account'],
+    cta1: 'Register as a seller', cta2: 'Learn more',
+    sideLinks: ['Home','Orders','Products','Customers'],
+    kpis: [
+      { l: 'Today\'s sales',  v: '42,380', u: 'SAR', c: '#0F4D3A' },
+      { l: 'Orders',          v: '247',    c: '#A98232' },
+      { l: 'New customers',   v: '42',     c: '#B0492C' },
+    ],
+    chartTitle: 'Weekly revenue',
+  };
   return (
     <section id="sellers" className="l-sellers">
       <div className="l-container l-sellers-inner">
         <div className="l-sellers-copy">
           <div className="l-eyebrow l-eyebrow-light">
             <span className="l-eyebrow-dot l-eyebrow-dot-light"></span>
-            للبائعين والحرفيين
+            {t.eyebrow}
           </div>
-          <h2 className="l-sellers-title">
-            بضاعتك السودانية،<br/>
-            <span className="l-accent">سوق سعودي يقدّرها.</span>
-          </h2>
-          <p className="l-sellers-sub">
-            افتح متجرك الإلكتروني في دقائق، أوصل منتجاتك لآلاف العملاء في كل مدن المملكة، ودع سودان مارت يتكفّل بالشحن والدفع والدعم.
-          </p>
+          <h2 className="l-sellers-title">{t.title}</h2>
+          <p className="l-sellers-sub">{t.sub}</p>
           <ul className="l-sellers-list">
-            <li><I.check size={18} stroke="var(--accent)"/> عمولة منخفضة وشفافة</li>
-            <li><I.check size={18} stroke="var(--accent)"/> أدوات إدارة كاملة من جوالك</li>
-            <li><I.check size={18} stroke="var(--accent)"/> دعم تسويقي وحملات إعلانية</li>
-            <li><I.check size={18} stroke="var(--accent)"/> دفعات أسبوعية إلى حسابك البنكي</li>
+            {t.list.map(li => <li key={li}><I.check size={18} stroke="var(--accent)"/> {li}</li>)}
           </ul>
           <div className="l-sellers-cta">
-            <a className="l-btn l-btn-gold">سجّل بائعاً <I.forward size={16}/></a>
-            <a className="l-btn l-btn-outline-light">تعرّف أكثر</a>
+            <a className="l-btn l-btn-gold">{t.cta1} <I.forward size={16}/></a>
+            <a className="l-btn l-btn-outline-light">{t.cta2}</a>
           </div>
         </div>
 
@@ -512,7 +621,7 @@ function Sellers() {
             </div>
             <div className="l-dash-body">
               <div className="l-dash-side">
-                {['الرئيسية','الطلبات','المنتجات','العملاء'].map((x, i) => (
+                {t.sideLinks.map((x, i) => (
                   <div key={x} className={`l-dash-link ${i === 0 ? 'active' : ''}`}>
                     <span style={{ width: 6, height: 6, background: i === 0 ? '#fff' : '#8B7D6E', borderRadius: 2 }}></span>
                     {x}
@@ -521,11 +630,7 @@ function Sellers() {
               </div>
               <div className="l-dash-main">
                 <div className="l-dash-kpis">
-                  {[
-                    { l: 'مبيعات اليوم', v: '٤٢٬٣٨٠', u: 'ر.س', c: '#0F4D3A' },
-                    { l: 'طلبات', v: '٢٤٧', c: '#A98232' },
-                    { l: 'عملاء جدد', v: '٤٢', c: '#B0492C' },
-                  ].map(k => (
+                  {t.kpis.map(k => (
                     <div key={k.l} className="l-dash-kpi">
                       <div className="l-dash-kpi-l">{k.l}</div>
                       <div className="l-dash-kpi-v">{k.v} {k.u && <span>{k.u}</span>}</div>
@@ -534,7 +639,7 @@ function Sellers() {
                   ))}
                 </div>
                 <div className="l-dash-chart">
-                  <div style={{ fontSize: 11, fontWeight: 800, marginBottom: 10 }}>إيرادات الأسبوع</div>
+                  <div style={{ fontSize: 11, fontWeight: 800, marginBottom: 10 }}>{t.chartTitle}</div>
                   <div className="l-dash-bars">
                     {[42, 60, 38, 72, 55, 88, 70].map((h, i) => (
                       <div key={i} className="l-dash-bar-item">
@@ -554,16 +659,25 @@ function Sellers() {
 
 /* ───────── Testimonials ───────── */
 function Testimonials() {
-  const reviews = [
+  const lang = useLang();
+  const reviews = lang === 'ar' ? [
     { user: 'سارة الزهراني', city: 'الرياض', text: 'البن السوداني كان فوق التوقعات، رائحته ملأت البيت! توصيل سريع جداً للرياض.', rating: 5 },
     { user: 'عبد الله القحطاني', city: 'جدة', text: 'وجدت كل احتياجات شهر رمضان من السودان في تطبيق واحد. التجربة سهلة جداً.', rating: 5 },
     { user: 'هند الشمري', city: 'الدمام', text: 'العطور والبخور أصلية ١٠٠٪. هذا التطبيق ملأ فراغاً كبيراً في السوق السعودي.', rating: 5 },
     { user: 'ناصر العتيبي', city: 'مكة', text: 'الدفع بـ tabby خلاني أطلب بمرونة. الجودة ممتازة والمنتجات سودانية أصلية.', rating: 5 },
+  ] : [
+    { user: 'Sarah Al-Zahrani',  city: 'Riyadh', text: 'The Sudanese coffee was beyond expectations — its aroma filled the house! Super fast delivery to Riyadh.', rating: 5 },
+    { user: 'Abdullah Al-Qahtani', city: 'Jeddah', text: 'Found all my Ramadan essentials from Sudan in one app. The whole experience is so easy.', rating: 5 },
+    { user: 'Hind Al-Shammari', city: 'Dammam',   text: 'The perfumes and incense are 100% authentic. This app fills a real gap in the Saudi market.', rating: 5 },
+    { user: 'Nasser Al-Otaibi', city: 'Makkah',   text: 'Paying with tabby gives me real flexibility. Excellent quality and truly Sudanese products.', rating: 5 },
   ];
+  const head = lang === 'ar'
+    ? { title: 'ماذا يقول عملاؤنا', sub: 'آراء حقيقية من عملاء سعوديين جرّبوا التطبيق.' }
+    : { title: 'What our customers say', sub: 'Real reviews from Saudi customers who use the app.' };
   return (
     <section className="l-section">
       <div className="l-container">
-        <SectionHead eyebrow="TESTIMONIALS" ar="ماذا يقول عملاؤنا" sub="آراء حقيقية من عملاء سعوديين جرّبوا التطبيق."/>
+        <SectionHead eyebrow="TESTIMONIALS" ar={head.title} sub={head.sub}/>
         <div className="l-rev-grid">
           {reviews.map((r, i) => (
             <div key={i} className="l-rev">
@@ -588,15 +702,22 @@ function Testimonials() {
 
 /* ───────── Stats banner ───────── */
 function Stats() {
+  const lang = useLang();
+  const stats = lang === 'ar' ? [
+    { v: '+٢٤٬٠٠٠', l: 'مستخدم نشط' },
+    { v: '+٢٥٠',    l: 'بائع وحرفي' },
+    { v: '+٥٬٠٠٠',  l: 'منتج سوداني' },
+    { v: '٤.٩',     l: 'تقييم المتاجر' },
+  ] : [
+    { v: '+24,000', l: 'Active users' },
+    { v: '+250',    l: 'Sellers & artisans' },
+    { v: '+5,000',  l: 'Sudanese products' },
+    { v: '4.9',     l: 'Store rating' },
+  ];
   return (
     <section className="l-stats">
       <div className="l-container l-stats-grid">
-        {[
-          { v: '+٢٤٬٠٠٠', l: 'مستخدم نشط' },
-          { v: '+٢٥٠', l: 'بائع وحرفي' },
-          { v: '+٥٬٠٠٠', l: 'منتج سوداني' },
-          { v: '٤.٩', l: 'تقييم المتاجر' },
-        ].map(s => (
+        {stats.map(s => (
           <div key={s.l} className="l-stat">
             <div className="l-stat-v">{s.v}</div>
             <div className="l-stat-l">{s.l}</div>
@@ -609,25 +730,44 @@ function Stats() {
 
 /* ───────── FAQ ───────── */
 function Faq() {
-  const items = [
-    { q: 'هل التطبيق متوفر في كل مدن المملكة؟', a: 'نعم، التوصيل متاح في جميع المدن الرئيسية والثانوية بالمملكة بما فيها الرياض، جدة، الدمام، الخبر، مكة، المدينة، الطائف، تبوك، وأبها.' },
-    { q: 'كم تستغرق مدة التوصيل؟', a: '٢٤ ساعة للرياض والمدن الرئيسية، و٤٨ ساعة لباقي المدن. التوصيل السريع متاح أيضاً ليوم العمل التالي.' },
-    { q: 'هل المنتجات سودانية أصلية؟', a: 'كل المنتجات تأتي مباشرة من مزارعين وحرفيين سودانيين معتمدين، مع شهادات منشأ وضمان استرداد ١٤ يوم.' },
-    { q: 'ما طرق الدفع المتاحة؟', a: 'مدى، فيزا، ماستركارد، أبل باي، tabby، tamara، والدفع عند الاستلام (في مدن مختارة).' },
-    { q: 'كيف أصبح بائعاً في التطبيق؟', a: 'سجّل في تبويب "للبائعين" — ستحتاج سجل تجاري سعودي وحساب بنكي، والباقي علينا.' },
-  ];
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    eyebrow: 'الأسئلة الشائعة',
+    title: <>إجابات سريعة<br/>لأهم استفساراتك.</>,
+    sub: 'لم تجد ما تبحث عنه؟ تواصل معنا عبر واتساب وسنرد خلال دقائق.',
+    waBtn: 'تواصل واتساب',
+    items: [
+      { q: 'هل التطبيق متوفر في كل مدن المملكة؟', a: 'نعم، التوصيل متاح في جميع المدن الرئيسية والثانوية بالمملكة بما فيها الرياض، جدة، الدمام، الخبر، مكة، المدينة، الطائف، تبوك، وأبها.' },
+      { q: 'كم تستغرق مدة التوصيل؟', a: '٢٤ ساعة للرياض والمدن الرئيسية، و٤٨ ساعة لباقي المدن. التوصيل السريع متاح أيضاً ليوم العمل التالي.' },
+      { q: 'هل المنتجات سودانية أصلية؟', a: 'كل المنتجات تأتي مباشرة من مزارعين وحرفيين سودانيين معتمدين، مع شهادات منشأ وضمان استرداد ١٤ يوم.' },
+      { q: 'ما طرق الدفع المتاحة؟', a: 'مدى، فيزا، ماستركارد، أبل باي، tabby، tamara، والدفع عند الاستلام (في مدن مختارة).' },
+      { q: 'كيف أصبح بائعاً في التطبيق؟', a: 'سجّل في تبويب "للبائعين" — ستحتاج سجل تجاري سعودي وحساب بنكي، والباقي علينا.' },
+    ],
+  } : {
+    eyebrow: 'Frequently asked',
+    title: <>Quick answers<br/>to your top questions.</>,
+    sub: "Didn't find what you need? Reach us on WhatsApp — we reply within minutes.",
+    waBtn: 'WhatsApp us',
+    items: [
+      { q: 'Is the app available across all Saudi cities?', a: 'Yes. Delivery covers all major and secondary Saudi cities including Riyadh, Jeddah, Dammam, Khobar, Makkah, Madinah, Taif, Tabuk, and Abha.' },
+      { q: 'How long does delivery take?', a: '24 hours to Riyadh and main cities, 48 hours to other cities. Same-business-day express delivery is also available.' },
+      { q: 'Are the products genuinely Sudanese?', a: 'Every product comes directly from verified Sudanese farmers and artisans, with origin certificates and a 14-day refund guarantee.' },
+      { q: 'What payment methods are supported?', a: 'mada, Visa, Mastercard, Apple Pay, tabby, tamara, and cash on delivery (in selected cities).' },
+      { q: 'How do I become a seller on the app?', a: 'Register from the "For sellers" tab — you\'ll need a Saudi commercial registration and a bank account. We handle the rest.' },
+    ],
+  };
   const [open, setOpen] = React.useState(0);
   return (
     <section id="faq" className="l-section l-section-tinted">
       <div className="l-container l-faq-wrap">
         <div>
-          <div className="l-eyebrow"><span className="l-eyebrow-dot"></span>الأسئلة الشائعة</div>
-          <h2 className="l-sec-title">إجابات سريعة<br/>لأهم استفساراتك.</h2>
-          <p className="l-sec-sub">لم تجد ما تبحث عنه؟ تواصل معنا عبر واتساب وسنرد خلال دقائق.</p>
-          <a className="l-btn l-btn-outline" style={{ marginTop: 14 }}><I.whatsapp size={18}/> تواصل واتساب</a>
+          <div className="l-eyebrow"><span className="l-eyebrow-dot"></span>{t.eyebrow}</div>
+          <h2 className="l-sec-title">{t.title}</h2>
+          <p className="l-sec-sub">{t.sub}</p>
+          <a className="l-btn l-btn-outline" style={{ marginTop: 14 }}><I.whatsapp size={18}/> {t.waBtn}</a>
         </div>
         <div className="l-faq-list">
-          {items.map((it, i) => (
+          {t.items.map((it, i) => (
             <div key={i} className={`l-faq ${i === open ? 'open' : ''}`} onClick={() => setOpen(i === open ? -1 : i)}>
               <div className="l-faq-q">
                 <span>{it.q}</span>
@@ -644,6 +784,20 @@ function Faq() {
 
 /* ───────── Download CTA ───────── */
 function DownloadCta() {
+  const lang = useLang();
+  const t = lang === 'ar' ? {
+    eyebrow: 'متاح الآن',
+    title: <>حمّل سودان مارت اليوم،<br/><span className="l-accent">واحصل على خصم ١٥٪</span> على أول طلب.</>,
+    sub: <>استخدم كود <span className="l-code">KSA2026</span> عند الدفع.</>,
+    getOn: 'احصل عليه من', downloadOn: 'حمّله من',
+    qrTitle: 'امسح الكود', qrSub: 'للتحميل المباشر من جوالك',
+  } : {
+    eyebrow: 'Available now',
+    title: <>Download Sudan Mart today,<br/><span className="l-accent">get 15% off</span> your first order.</>,
+    sub: <>Use code <span className="l-code">KSA2026</span> at checkout.</>,
+    getOn: 'Get it on', downloadOn: 'Download on the',
+    qrTitle: 'Scan the code', qrSub: 'To download straight to your phone',
+  };
   return (
     <section id="download" className="l-download">
       <svg className="l-download-bg" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
@@ -656,24 +810,21 @@ function DownloadCta() {
       </svg>
       <div className="l-container l-download-inner">
         <div className="l-download-copy">
-          <div className="l-eyebrow l-eyebrow-light"><span className="l-eyebrow-dot l-eyebrow-dot-light"></span>متاح الآن</div>
-          <h2 className="l-download-title">
-            حمّل سودان مارت اليوم،<br/>
-            <span className="l-accent">واحصل على خصم ١٥٪</span> على أول طلب.
-          </h2>
-          <p className="l-download-sub">استخدم كود <span className="l-code">KSA2026</span> عند الدفع.</p>
+          <div className="l-eyebrow l-eyebrow-light"><span className="l-eyebrow-dot l-eyebrow-dot-light"></span>{t.eyebrow}</div>
+          <h2 className="l-download-title">{t.title}</h2>
+          <p className="l-download-sub">{t.sub}</p>
           <div className="l-download-cta">
             <a className="l-store l-store-dark l-store-google">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M3 3l18 9-18 9zM3 3v18M3 3l13 9-13 9" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>
               <div>
-                <div className="l-store-small">احصل عليه من</div>
+                <div className="l-store-small">{t.getOn}</div>
                 <div className="l-store-big">Google Play</div>
               </div>
             </a>
             <a className="l-store l-store-dark l-store-apple">
               <I.apple size={22} stroke="currentColor"/>
               <div>
-                <div className="l-store-small">حمّله من</div>
+                <div className="l-store-small">{t.downloadOn}</div>
                 <div className="l-store-big">App Store</div>
               </div>
             </a>
@@ -684,8 +835,8 @@ function DownloadCta() {
               <QRTile/>
             </div>
             <div>
-              <div className="l-qr-title">امسح الكود</div>
-              <div className="l-qr-sub">للتحميل المباشر من جوالك</div>
+              <div className="l-qr-title">{t.qrTitle}</div>
+              <div className="l-qr-sub">{t.qrSub}</div>
             </div>
           </div>
         </div>
@@ -737,12 +888,23 @@ function QRTile() {
 
 /* ───────── Footer ───────── */
 function Footer() {
-  const cols = [
+  const lang = useLang();
+  const cols = lang === 'ar' ? [
     { t: 'التطبيق', items: ['الرئيسية', 'الأقسام', 'العروض', 'الأكثر مبيعاً'] },
-    { t: 'الشركة', items: ['من نحن', 'الوظائف', 'المدونة', 'الصحافة'] },
-    { t: 'الدعم', items: ['مركز المساعدة', 'الشحن والإرجاع', 'تواصل معنا', 'تتبع الطلب'] },
-    { t: 'قانوني', items: ['شروط الاستخدام', 'سياسة الخصوصية', 'سياسة الإرجاع', 'الزكاة والضريبة'] },
+    { t: 'الشركة',  items: ['من نحن', 'الوظائف', 'المدونة', 'الصحافة'] },
+    { t: 'الدعم',   items: ['مركز المساعدة', 'الشحن والإرجاع', 'تواصل معنا', 'تتبع الطلب'] },
+    { t: 'قانوني',  items: ['شروط الاستخدام', 'سياسة الخصوصية', 'سياسة الإرجاع', 'الزكاة والضريبة'] },
+  ] : [
+    { t: 'App',     items: ['Home', 'Categories', 'Deals', 'Best sellers'] },
+    { t: 'Company', items: ['About us', 'Careers', 'Blog', 'Press'] },
+    { t: 'Support', items: ['Help center', 'Shipping & returns', 'Contact us', 'Track order'] },
+    { t: 'Legal',   items: ['Terms of service', 'Privacy policy', 'Return policy', 'Zakat & VAT'] },
   ];
+  const tag = tr(lang,
+    'منصة سعودية لتوصيل أصالة المنتجات السودانية إلى كل بيت في المملكة.',
+    'A Saudi platform delivering authentic Sudanese products to every home in the Kingdom.');
+  const brandAr = tr(lang, 'سودان مارت', 'Sudan Mart');
+  const copyright = tr(lang, '© ٢٠٢٦ سودان مارت · جميع الحقوق محفوظة', '© 2026 Sudan Mart · All rights reserved');
   return (
     <footer className="l-footer">
       <div className="l-container l-footer-grid">
@@ -750,11 +912,11 @@ function Footer() {
           <div className="l-brand">
             <SMLogo size={44}/>
             <div className="l-brand-text">
-              <div className="l-brand-ar" style={{ color: '#fff' }}>سودان مارت</div>
+              <div className="l-brand-ar" style={{ color: '#fff' }}>{brandAr}</div>
               <div className="l-brand-en">S U D A N · M A R T</div>
             </div>
           </div>
-          <p className="l-footer-tag">منصة سعودية لتوصيل أصالة المنتجات السودانية إلى كل بيت في المملكة.</p>
+          <p className="l-footer-tag">{tag}</p>
           <div className="l-socials">
             {['x','instagram','tiktok','snapchat','youtube'].map(s => (
               <a key={s} className="l-social">
@@ -774,7 +936,7 @@ function Footer() {
       </div>
       <div className="l-footer-bottom">
         <div className="l-container l-footer-bottom-inner">
-          <div>© ٢٠٢٦ سودان مارت · جميع الحقوق محفوظة</div>
+          <div>{copyright}</div>
         </div>
       </div>
     </footer>

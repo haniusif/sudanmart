@@ -404,12 +404,12 @@ const PRODUCTS=[
  {id:'p6',ar:'بخور تلقاي معتق',en:'Talqai Incense Premium',cat:'perfume',price:65,rating:4.8,reviews:256,seller:'دار العطور',img:'1602928321679-560bb453f190'},
  {id:'p7',ar:'تمر مدينة فاخر — كيلو',en:'Medina Dates Premium 1kg',cat:'dates',price:42,rating:4.7,reviews:167,seller:'تمور النخيل',img:'1519676867240-f03562e64548'},
  {id:'p8',ar:'ثوب نسائي مطرز يدوياً',en:'Hand-embroidered Thobe',cat:'textile',price:220,rating:4.9,reviews:64,tag:'حصري',seller:'أقمشة السودان',img:'1558769132-cb1aea458c5e'},
- {id:'p9',ar:'سمسم أبيض مغسول',en:'Washed White Sesame 1kg',cat:'food',price:16,rating:4.6,reviews:92,seller:'سوق الخرطوم',img:'1590779033100-9f60a05a013d'},
+ {id:'p9',ar:'سمسم أبيض مغسول',en:'Washed White Sesame 1kg',cat:'food',price:16,rating:4.6,reviews:92,seller:'سودان مارت',img:'1590779033100-9f60a05a013d'},
  {id:'p10',ar:'دلكة بخور للعروس',en:'Bridal Dilka Smoke Bath',cat:'perfume',price:55,rating:4.9,reviews:312,tag:'الأكثر مبيعاً',seller:'دار العطور',img:'1592945403244-b3fbafd7f539'},
- {id:'p11',ar:'قهوة جبنة مع زنجبيل',en:'Jebena Coffee w/ Ginger',cat:'coffee',price:28,rating:4.7,reviews:88,seller:'بيت البن',img:'1509042239860-f550ce710b93'},
+ {id:'p11',ar:'قهوة جبنة مع زنجبيل',en:'Jebena Coffee w/ Ginger',cat:'coffee',price:28,rating:4.7,reviews:88,seller:'سودان مارت',img:'1509042239860-f550ce710b93'},
  {id:'p12',ar:'سلة خوص يدوية كبيرة',en:'Hand-woven Palm Basket L',cat:'craft',price:78,rating:4.8,reviews:41,seller:'حرف نوبية',img:'1524253482453-3fed8d2fe12b'},
  {id:'p13',ar:'حلاوة طحينية بالسمسم',en:'Sesame Halawa 500g',cat:'sweets',price:22,rating:4.5,reviews:67,seller:'حلويات الخرطوم',img:'1606313564200-e75d5e30476c'},
- {id:'p14',ar:'فول سوداني مملح',en:'Salted Peanuts 500g',cat:'beans',price:12,rating:4.6,reviews:134,seller:'مزارع كردفان',img:'1567892737950-30c4db37cd89'},
+ {id:'p14',ar:'فول سوداني مملح',en:'Salted Peanuts 500g',cat:'beans',price:12,rating:4.6,reviews:134,seller:'سودان مارت',img:'1567892737950-30c4db37cd89'},
 ];
 const BANNERS=[
  {ar:'عروض رمضان',sub:'خصم حتى 40% على المنتجات السودانية الأصيلة',cta:'تسوّق الآن',bg:'linear-gradient(135deg,#0F4D3A 0%,#14654C 60%,#2B7A5D 100%)',tag:'حصري',glyph:'cup',ink:'#E5C97A',go:'#/shop'},
@@ -438,8 +438,24 @@ const FLASH=PRODUCTS.filter(p=>p.tag&&p.tag.startsWith('-'));
 const BEST=PRODUCTS.slice().sort((a,b)=>b.reviews-a.reviews).slice(0,10);
 const catName=c=>{const x=CATEGORIES.find(k=>k.cat===c);return x?x.ar:c};
 const byId=id=>PRODUCTS.find(p=>p.id===id);
-// Single-vendor: the whole store is one merchant
+// Marketplace: many vendors, including the in-house store (سودان مارت)
 const STORE={name:'سودان مارت',en:'Sudan Mart'};
+const INHOUSE='سودان مارت';
+const VENDORS=[
+ {name:'سودان مارت',inhouse:true,rating:4.9,city:'الرياض',since:'٢٠٢٤',commission:0},
+ {name:'بيت البن',rating:4.9,city:'أم درمان',since:'٢٠٢٤',commission:12},
+ {name:'مزارع كردفان',rating:4.8,city:'كردفان',since:'٢٠٢٥',commission:12},
+ {name:'سوق الخرطوم',rating:4.6,city:'الخرطوم',since:'٢٠٢٤',commission:15},
+ {name:'بهارات أم درمان',rating:4.7,city:'أم درمان',since:'٢٠٢٥',commission:12},
+ {name:'دار العطور',rating:4.9,city:'الخرطوم',since:'٢٠٢٣',commission:10},
+ {name:'تمور النخيل',rating:4.7,city:'المدينة',since:'٢٠٢٥',commission:12},
+ {name:'أقمشة السودان',rating:4.9,city:'الخرطوم',since:'٢٠٢٤',commission:15},
+ {name:'حرف نوبية',rating:4.8,city:'حلفا',since:'٢٠٢٥',commission:12},
+ {name:'حلويات الخرطوم',rating:4.5,city:'الخرطوم',since:'٢٠٢٤',commission:12},
+];
+const vendorMeta=Object.fromEntries(VENDORS.map(v=>[v.name,v]));
+const isInhouse=n=>!!(vendorMeta[n]&&vendorMeta[n].inhouse);
+const vendorProducts=n=>PRODUCTS.filter(p=>p.seller===n);
 
 /* ═══════════════════ ICONS ═══════════════════ */
 function ic(name,o={}){
@@ -562,7 +578,7 @@ function pcard(p){
   '<div class="pbody">'+
    '<div class="pname">'+p.ar+'</div>'+
    '<div class="pen">'+p.en+'</div>'+
-   '<div class="pseller">'+ic('shield',{size:12,color:'var(--text-4)'})+'منتج أصلي · شحن سريع</div>'+
+   '<div class="pseller">'+ic('shield',{size:12,color:isInhouse(p.seller)?'var(--accent)':'var(--text-4)'})+p.seller+(isInhouse(p.seller)?' · رسمي':'')+'</div>'+
    '<div class="prow">'+
     '<div><span class="price">'+money(p.price)+' <span class="cur">ر.س</span></span>'+(p.old?'<span class="price old">'+money(p.old)+'</span>':'')+'</div>'+
     '<button class="addb" data-add="'+p.id+'">'+ic('plus',{size:16})+'</button>'+
@@ -612,8 +628,8 @@ function footer(){
     '<div class="pays"><span class="pay">VISA</span><span class="pay">Mastercard</span><span class="pay">mada</span><span class="pay">Apple Pay</span><span class="pay">الدفع عند الاستلام</span></div>'+
    '</div>'+
    '<div><h5>تسوّق</h5>'+CATEGORIES.slice(0,6).map(c=>'<a data-nav="#/shop/'+c.cat+'">'+c.ar+'</a>').join('')+'</div>'+
-   '<div><h5>حسابي</h5><a data-nav="#/orders">طلباتي</a><a data-nav="#/favorites">المفضلة</a><a data-nav="#/cart">سلة التسوق</a><a data-nav="#/account">إعداداتي</a><a data-nav="#/admin">لوحة الإدارة</a></div>'+
-   '<div><h5>تواصل معنا</h5><a>'+ic('headset',{size:15})+' الدعم: 24/7</a><a>الأسئلة الشائعة</a><a>سياسة الإرجاع</a><a>الشحن والتوصيل</a><a>كن بائعاً معنا</a></div>'+
+   '<div><h5>حسابي</h5><a data-nav="#/orders">طلباتي</a><a data-nav="#/favorites">المفضلة</a><a data-nav="#/cart">سلة التسوق</a><a data-nav="#/account">إعداداتي</a></div>'+
+   '<div><h5>المنصة</h5><a data-nav="#/admin">لوحة المشرف (Super Admin)</a><a data-nav="#/vendor">لوحة البائع (Vendor)</a><a data-nav="#/shop">تصفّح البائعين</a><a>كن بائعاً معنا</a><a>'+ic('headset',{size:15})+' الدعم: 24/7</a></div>'+
   '</div>'+
   '<div class="fbottom"><span>© ٢٠٢٦ سودان مارت — جميع الحقوق محفوظة</span><span class="en">Made with care · صُنع بحب للجالية السودانية</span></div>'+
  '</div>';
@@ -660,16 +676,17 @@ function pageHome(){
  '</div>';
 }
 
-let shopState={cat:null,sort:'pop',maxPrice:250,minRating:0,q:''};
+let shopState={cat:null,sort:'pop',maxPrice:250,minRating:0,q:'',vendor:null};
 function pageShop(cat){
  shopState.cat=cat||null;
  let list=PRODUCTS.slice();
  if(shopState.cat)list=list.filter(p=>p.cat===shopState.cat);
- if(shopState.q){const q=shopState.q.trim();list=list.filter(p=>(p.ar+p.en).includes(q)||p.en.toLowerCase().includes(q.toLowerCase()))}
+ if(shopState.q){const q=shopState.q.trim();list=list.filter(p=>(p.ar+p.en+p.seller).includes(q)||p.en.toLowerCase().includes(q.toLowerCase()))}
+ if(shopState.vendor)list=list.filter(p=>p.seller===shopState.vendor);
  list=list.filter(p=>p.price<=shopState.maxPrice&&p.rating>=shopState.minRating);
  const S={pop:(a,b)=>b.reviews-a.reviews,plow:(a,b)=>a.price-b.price,phigh:(a,b)=>b.price-a.price,rate:(a,b)=>b.rating-a.rating};
  list.sort(S[shopState.sort]);
- const title=shopState.q?('نتائج البحث: "'+shopState.q+'"'):(shopState.cat?catName(shopState.cat):'كل المنتجات');
+ const title=shopState.q?('نتائج البحث: "'+shopState.q+'"'):(shopState.vendor?('متجر '+shopState.vendor):(shopState.cat?catName(shopState.cat):'كل المنتجات'));
  return '<div class="wrap fade">'+
   '<div class="crumb"><a data-nav="#/">الرئيسية</a>'+ic('chev',{size:14})+'<a data-nav="#/shop">المتجر</a>'+(shopState.cat?ic('chev',{size:14})+'<span>'+catName(shopState.cat)+'</span>':'')+'</div>'+
   '<div class="shop">'+
@@ -680,6 +697,10 @@ function pageShop(cat){
     '</div></div>'+
     '<div class="fbox"><h4>السعر الأقصى</h4><input type="range" class="range" min="10" max="250" step="5" value="'+shopState.maxPrice+'" data-price><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;font-weight:700"><span class="muted">١٠ ر.س</span><span style="color:var(--primary)" id="pv">'+shopState.maxPrice+' ر.س</span></div></div>'+
     '<div class="fbox"><h4>التقييم</h4><div class="flist">'+[0,4,4.5,4.8].map(r=>'<div class="frow'+(shopState.minRating===r?' active':'')+'" data-rating="'+r+'">'+(r===0?'الكل':'<span style="display:flex;align-items:center;gap:4px">'+ic('star',{size:14})+r+' فأعلى</span>')+'</div>').join('')+'</div></div>'+
+    '<div class="fbox"><h4>البائع</h4><div class="flist">'+
+      '<div class="frow'+(!shopState.vendor?' active':'')+'" data-vendor="">كل البائعين<span class="fc">'+VENDORS.length+'</span></div>'+
+      VENDORS.map(v=>'<div class="frow'+(shopState.vendor===v.name?' active':'')+'" data-vendor="'+v.name+'"><span style="display:flex;align-items:center;gap:5px">'+(v.inhouse?ic('shield',{size:13,color:'var(--accent)'}):'')+v.name+'</span><span class="fc">'+vendorProducts(v.name).length+'</span></div>').join('')+
+    '</div></div>'+
    '</aside>'+
    '<div><div class="shophead"><div><h2>'+title+'</h2><div class="sc">'+list.length+' منتج</div></div>'+
      '<div style="display:flex;gap:10px;align-items:center"><span class="muted" style="font-size:13px">ترتيب:</span><select class="sel" data-sort>'+
@@ -705,7 +726,7 @@ function pageProduct(id){
     '<div class="thumbs">'+[0,1,2,3].map(i=>'<div class="thumb'+(i===0?' on':'')+'">'+art(p.cat,null,'',p.img,160)+'</div>').join('')+'</div>'+
    '</div>'+
    '<div>'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pill info">'+catName(p.cat)+'</span><span class="pseller" style="font-size:12.5px;color:var(--text-3)">'+ic('shield',{size:14,color:'var(--primary)'})+' تُباع وتُشحن بواسطة '+STORE.name+'</span></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pill info">'+catName(p.cat)+'</span><span class="pseller" data-vendor="'+p.seller+'" style="font-size:12.5px;color:var(--text-3);cursor:pointer">'+ic('shield',{size:14,color:isInhouse(p.seller)?'var(--accent)':'var(--primary)'})+' البائع: '+p.seller+(isInhouse(p.seller)?' (بائع رسمي)':'')+'</span></div>'+
     '<h1>'+p.ar+'</h1><div class="pden">'+p.en+'</div>'+
     '<div style="display:flex;align-items:center;gap:10px"><div style="display:flex">'+stars(p.rating,17)+'</div><span style="font-weight:800">'+p.rating+'</span><span class="muted">('+p.reviews+' تقييم)</span></div>'+
     '<div class="pdprice"><span class="price">'+money(p.price)+' <span class="cur" style="font-size:16px">ر.س</span></span>'+(p.old?'<span class="price old" style="font-size:18px">'+money(p.old)+' ر.س</span><span class="pill danger">وفّر '+(p.old-p.price)+' ر.س</span>':'')+'</div>'+
@@ -727,7 +748,7 @@ function pageCart(){
  return '<div class="wrap fade"><h1 style="margin:26px 0 4px;font-size:26px">سلة التسوق</h1><div class="muted" style="margin-bottom:8px">'+cartCount()+' منتج في سلتك</div>'+
   '<div class="cartlay"><div>'+
    cart.map(it=>'<div class="citem"><div class="cart-art">'+art(it.p.cat,null,'',it.p.img,220)+'</div>'+
-     '<div class="cinfo"><div style="display:flex;justify-content:space-between;gap:10px"><div><div class="cname">'+it.p.ar+'</div><div class="copt">'+it.p.en+(it.opt.grind?' · '+it.opt.grind:'')+'</div><div class="copt">'+ic('shield',{size:12})+' '+STORE.name+'</div></div><button class="iconbtn" data-remove="'+it.key+'" style="width:38px;height:38px" title="حذف">'+ic('trash',{size:18,color:'var(--danger)'})+'</button></div>'+
+     '<div class="cinfo"><div style="display:flex;justify-content:space-between;gap:10px"><div><div class="cname">'+it.p.ar+'</div><div class="copt">'+it.p.en+(it.opt.grind?' · '+it.opt.grind:'')+'</div><div class="copt">'+ic('shield',{size:12})+' البائع: '+it.p.seller+'</div></div><button class="iconbtn" data-remove="'+it.key+'" style="width:38px;height:38px" title="حذف">'+ic('trash',{size:18,color:'var(--danger)'})+'</button></div>'+
      '<div class="cbot"><div class="qtybox"><button data-cq="'+it.key+'|-">'+ic('minus',{size:15})+'</button><span>'+it.qty+'</span><button data-cq="'+it.key+'|+">'+ic('plus',{size:15})+'</button></div><div class="price">'+money(it.p.price*it.qty)+' <span class="cur">ر.س</span></div></div>'+
      '</div></div>').join('')+
    '<button class="btn ghost" data-nav="#/shop" style="color:var(--primary)">'+ic('chevl',{size:16,color:'var(--primary)'})+' متابعة التسوق</button>'+
@@ -803,7 +824,7 @@ function pageAccount(){
  return '<div class="wrap fade"><h1 style="margin:26px 0 20px;font-size:26px">حسابي</h1>'+
   '<div class="card" style="padding:26px;display:flex;align-items:center;gap:18px;margin-bottom:20px"><div class="rav" style="width:70px;height:70px;font-size:26px;background:var(--primary);color:var(--primary-ink);border-radius:50%;display:grid;place-items:center;font-weight:800">م</div><div><div style="font-size:20px;font-weight:800">محمد أحمد</div><div class="muted">+966 55 ••• 4421 · الرياض</div><div style="margin-top:8px"><span class="pill gold">عضو ذهبي</span></div></div><button class="btn outline sm" style="margin-inline-start:auto">تعديل</button></div>'+
   '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">'+
-   [['receipt','طلباتي','٤ طلبات','#/orders'],['heart','المفضلة',favs.size+' منتج','#/favorites'],['settings','لوحة الإدارة','إدارة المتجر','#/admin'],['bag','سلتي',cartCount()+' منتج','#/cart'],['gift','نقاط المكافآت','١٢٠ نقطة','#/account'],['globe','اللغة','العربية','#/account']]
+   [['receipt','طلباتي','٤ طلبات','#/orders'],['heart','المفضلة',favs.size+' منتج','#/favorites'],['bag','سلتي',cartCount()+' منتج','#/cart'],['shield','لوحة المشرف','Super Admin','#/admin'],['trend','لوحة البائع','Vendor Panel','#/vendor'],['gift','نقاط المكافآت','١٢٠ نقطة','#/account']]
    .map(t=>'<div class="tb" data-nav="'+t[3]+'" style="cursor:pointer"><div class="tbic">'+ic(t[0],{size:22})+'</div><div><div class="tbt">'+t[1]+'</div><div class="tbs">'+t[2]+'</div></div></div>').join('')+
   '</div></div>';
 }
@@ -821,24 +842,27 @@ const ADMIN_KPIS=[
  {l:'متوسط قيمة الطلب',v:'١٧١',u:'ر.س',d:'-3%',up:0,c:'var(--green-500)'},
 ];
 const ADMIN_ORDERS=[
- {id:'SM-8501',cust:'فاطمة المنصوري',items:3,total:248,status:'pending',city:'الرياض',date:'اليوم — ٠٩:٤٢'},
- {id:'SM-8500',cust:'عبد الرحمن الشمري',items:2,total:124,status:'paid',city:'الرياض',date:'اليوم — ٠٩:١٨'},
- {id:'SM-8499',cust:'مريم الخالد',items:5,total:386,status:'paid',city:'جدة',date:'اليوم — ٠٨:٣٢'},
- {id:'SM-8498',cust:'محمد الحسن',items:1,total:95,status:'shipped',city:'الرياض',date:'أمس'},
- {id:'SM-8497',cust:'سارة العنزي',items:4,total:165,status:'delivered',city:'مكة',date:'قبل يومين'},
- {id:'SM-8496',cust:'إبراهيم النور',items:2,total:195,status:'pending',city:'المدينة',date:'اليوم'},
+ {id:'SM-8501',cust:'فاطمة المنصوري',items:3,total:248,status:'pending',city:'الرياض',date:'اليوم — ٠٩:٤٢',vendor:'دار العطور'},
+ {id:'SM-8500',cust:'عبد الرحمن الشمري',items:2,total:124,status:'paid',city:'الرياض',date:'اليوم — ٠٩:١٨',vendor:'سودان مارت'},
+ {id:'SM-8499',cust:'مريم الخالد',items:5,total:386,status:'paid',city:'جدة',date:'اليوم — ٠٨:٣٢',vendor:'بيت البن'},
+ {id:'SM-8498',cust:'محمد الحسن',items:1,total:95,status:'shipped',city:'الرياض',date:'أمس',vendor:'سودان مارت'},
+ {id:'SM-8497',cust:'سارة العنزي',items:4,total:165,status:'delivered',city:'مكة',date:'قبل يومين',vendor:'تمور النخيل'},
+ {id:'SM-8496',cust:'إبراهيم النور',items:2,total:195,status:'pending',city:'المدينة',date:'اليوم',vendor:'سودان مارت'},
 ];
 const STOCK=[42,8,156,23,0,67,92,12,38,71,54,19,88,33];
 const ADMIN_NAV=[
  {k:'dashboard',ar:'الرئيسية',ic:'home'},
  {k:'orders',ar:'الطلبات',ic:'receipt',badge:'12'},
- {k:'products',ar:'المنتجات',ic:'bag',badge:''+PRODUCTS.length},
+ {k:'vendors',ar:'البائعون',ic:'shield',badge:''+VENDORS.length},
+ {k:'products',ar:'كل المنتجات',ic:'bag',badge:''+PRODUCTS.length},
  {k:'customers',ar:'العملاء',ic:'user'},
  {k:'analytics',ar:'التحليلات',ic:'trend'},
  {k:'promos',ar:'العروض والكوبونات',ic:'gift'},
  {k:'reviews',ar:'المراجعات',ic:'star'},
  {k:'settings',ar:'الإعدادات',ic:'settings'},
 ];
+// mock sales-per-vendor for admin views
+const VSALES={'سودان مارت':284,'بيت البن':142,'مزارع كردفان':96,'سوق الخرطوم':54,'بهارات أم درمان':61,'دار العطور':318,'تمور النخيل':72,'أقمشة السودان':88,'حرف نوبية':41,'حلويات الخرطوم':34};
 const AST={pending:['بانتظار الدفع','warn'],paid:['مدفوع','info'],shipped:['تم الشحن','gold'],delivered:['مكتمل','ok']};
 
 function pageAdmin(section){
@@ -847,7 +871,7 @@ function pageAdmin(section){
 }
 function adminSidebar(section){
  return '<div class="asidebar">'+
-  '<div class="abrand">'+logoSVG(34)+'<div><div class="an">سودان مارت</div><div class="as">ADMIN PANEL</div></div></div>'+
+  '<div class="abrand">'+logoSVG(34)+'<div><div class="an">سودان مارت</div><div class="as">SUPER ADMIN · المشرف</div></div></div>'+
   ADMIN_NAV.map(n=>'<div class="anav'+(section===n.k?' on':'')+'" data-nav="#/admin/'+n.k+'">'+ic(n.ic,{size:18})+'<span style="flex:1">'+n.ar+'</span>'+(n.badge?'<span class="abadge">'+n.badge+'</span>':'')+'</div>').join('')+
   '<div class="aplan"><div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:6px">الباقة الذهبية</div><div style="font-size:13px;font-weight:800;margin-bottom:10px">٧٢٪ من السعة</div><div style="height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden"><div style="width:72%;height:100%;background:var(--accent)"></div></div></div>'+
  '</div>';
@@ -866,9 +890,26 @@ function adminTop(){
 }
 function adminBody(section){
  if(section==='orders')return adminOrders();
+ if(section==='vendors')return adminVendors();
  if(section==='products')return adminProducts();
  if(section==='dashboard')return adminOverview();
  return adminPlaceholder(section);
+}
+function adminVendors(){
+ const rows=VENDORS.map(v=>{const pc=vendorProducts(v.name).length;const sales=VSALES[v.name]||0;return '<tr>'+
+   '<td style="padding:12px"><div style="display:flex;align-items:center;gap:10px"><div class="aavatar" style="width:36px;height:36px;font-size:13px;border-radius:11px">'+v.name[0]+'</div><div><div style="font-weight:700;display:flex;align-items:center;gap:6px">'+v.name+(v.inhouse?ic('shield',{size:13,color:'var(--accent)'}):'')+'</div><div style="font-size:10.5px;color:var(--text-3)">'+v.city+' · منذ '+v.since+'</div></div></div></td>'+
+   '<td style="padding:12px">'+(v.inhouse?'<span class="pill gold">داخلي · رسمي</span>':'<span class="pill info">بائع خارجي</span>')+'</td>'+
+   '<td style="padding:12px;font-weight:700">'+pc+'</td>'+
+   '<td style="padding:12px;font-weight:800">'+sales+'K ر.س</td>'+
+   '<td style="padding:12px"><span style="display:inline-flex;align-items:center;gap:3px;font-weight:700">'+ic('star',{size:13})+v.rating+'</span></td>'+
+   '<td style="padding:12px;font-weight:700">'+(v.commission===0?'—':v.commission+'%')+'</td>'+
+   '<td style="padding:12px"><span class="pill ok">نشط</span></td>'+
+   '<td style="padding:12px"><div style="display:flex;gap:4px"><button class="aicon-btn" title="عرض لوحة البائع" data-nav="#/vendor">'+ic('trend',{size:14,color:'var(--text-2)'})+'</button><button class="aicon-btn">'+ic('more',{size:14,color:'var(--text-2)'})+'</button></div></td>'+
+  '</tr>';}).join('');
+ return '<div style="padding:24px">'+
+  '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">البائعون</div><div style="font-size:12.5px;color:var(--text-3)">'+VENDORS.length+' بائع · منهم بائع داخلي رسمي واحد</div></div><button class="btn primary sm">'+ic('plus',{size:16,color:'#fff'})+' دعوة بائع</button></div>'+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['البائع','النوع','المنتجات','المبيعات','التقييم','العمولة','الحالة',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+ '</div>';
 }
 function adminOverview(){
  return '<div style="padding:24px">'+
@@ -907,10 +948,11 @@ function adminProducts(){
  return '<div style="padding:24px">'+
   '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">المنتجات</div><div style="font-size:12.5px;color:var(--text-3)">إجمالي '+PRODUCTS.length+' منتج · '+CATEGORIES.length+' أقسام</div></div><div style="display:flex;gap:10px"><button class="btn outline sm">'+ic('download',{size:16})+' تصدير</button><button class="btn primary sm">'+ic('plus',{size:16,color:'#fff'})+' منتج جديد</button></div></div>'+
   '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div class="asearch" style="min-width:240px;max-width:280px">'+ic('search',{size:16,color:'var(--text-3)'})+'<input placeholder="ابحث عن منتج…"></div>'+['كل الأقسام','متوفر','تنبيه مخزون','مسودة'].map((c,i)=>'<span class="chip'+(i===0?' active':'')+'">'+c+'</span>').join('')+'</div>'+
-  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['المنتج','القسم','السعر','المخزون','المبيعات','الحالة',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['المنتج','القسم','البائع','السعر','المخزون','المبيعات','الحالة',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
   PRODUCTS.map((p,i)=>{const stock=STOCK[i];return '<tr>'+
     '<td style="padding:12px"><div style="display:flex;align-items:center;gap:10px"><div class="aprodimg">'+art(p.cat,null,'',p.img,80)+'</div><div><div style="font-weight:700">'+p.ar+'</div><div style="font-size:10.5px;color:var(--text-3)">SKU: SM-'+(1000+i)+'</div></div></div></td>'+
     '<td style="padding:12px;color:var(--text-2)">'+catName(p.cat)+'</td>'+
+    '<td style="padding:12px;color:var(--text-2)"><span style="display:inline-flex;align-items:center;gap:4px">'+(isInhouse(p.seller)?ic('shield',{size:12,color:'var(--accent)'}):'')+p.seller+'</span></td>'+
     '<td style="padding:12px;font-weight:700">'+p.price+' ر.س</td>'+
     '<td style="padding:12px"><div style="display:flex;align-items:center;gap:8px"><div style="width:60px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden"><div style="width:'+Math.min(100,stock)+'%;height:100%;background:'+(stock===0?'var(--danger)':stock<20?'var(--warning)':'var(--success)')+'"></div></div><span style="font-weight:700;font-size:12.5px">'+stock+'</span></div></td>'+
     '<td style="padding:12px;font-weight:700">'+p.reviews+'</td>'+
@@ -926,8 +968,8 @@ function adminOrders(){
  return '<div style="padding:24px">'+
   '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">الطلبات</div><div style="font-size:12.5px;color:var(--text-3)">إدارة وتتبع جميع الطلبات</div></div><button class="btn primary sm">'+ic('download',{size:16,color:'#fff'})+' تقرير</button></div>'+
   '<div class="atabs">'+tabs.map((t,i)=>'<button class="atab'+(i===0?' on':'')+'">'+t[0]+'<span class="tn">'+t[1]+'</span></button>').join('')+'</div>'+
-  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['الطلب','العميل','المدينة','العناصر','الإجمالي','الحالة','التاريخ',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
-  ADMIN_ORDERS.map(o=>'<tr><td style="padding:14px;font-weight:800;color:var(--primary)">#'+o.id+'</td><td style="padding:14px"><div style="display:flex;align-items:center;gap:8px"><div class="aavatar">'+o.cust[0]+'</div><span style="font-weight:600">'+o.cust+'</span></div></td><td style="padding:14px;color:var(--text-2)">'+o.city+'</td><td style="padding:14px;font-weight:700">× '+o.items+'</td><td style="padding:14px;font-weight:800">'+o.total+' ر.س</td><td style="padding:14px"><span class="pill '+AST[o.status][1]+'">'+AST[o.status][0]+'</span></td><td style="padding:14px;color:var(--text-3);font-size:12px">'+o.date+'</td><td style="padding:14px"><button class="btn outline sm" style="padding:6px 12px;font-size:11.5px">تفاصيل</button></td></tr>').join('')+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['الطلب','العميل','البائع','المدينة','العناصر','الإجمالي','الحالة','التاريخ',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  ADMIN_ORDERS.map(o=>'<tr><td style="padding:14px;font-weight:800;color:var(--primary)">#'+o.id+'</td><td style="padding:14px"><div style="display:flex;align-items:center;gap:8px"><div class="aavatar">'+o.cust[0]+'</div><span style="font-weight:600">'+o.cust+'</span></div></td><td style="padding:14px;color:var(--text-2)"><span style="display:inline-flex;align-items:center;gap:4px">'+(isInhouse(o.vendor)?ic('shield',{size:12,color:'var(--accent)'}):'')+o.vendor+'</span></td><td style="padding:14px;color:var(--text-2)">'+o.city+'</td><td style="padding:14px;font-weight:700">× '+o.items+'</td><td style="padding:14px;font-weight:800">'+o.total+' ر.س</td><td style="padding:14px"><span class="pill '+AST[o.status][1]+'">'+AST[o.status][0]+'</span></td><td style="padding:14px;color:var(--text-3);font-size:12px">'+o.date+'</td><td style="padding:14px"><button class="btn outline sm" style="padding:6px 12px;font-size:11.5px">تفاصيل</button></td></tr>').join('')+
   '</tbody></table></div>'+
  '</div>';
 }
@@ -936,17 +978,115 @@ function adminPlaceholder(name){
  return '<div style="padding:24px"><div class="acard" style="padding:60px 24px;text-align:center"><div style="width:76px;height:76px;border-radius:22px;background:var(--surface-2);display:grid;place-items:center;margin:0 auto 16px">'+ic('settings',{size:36,color:'var(--text-3)'})+'</div><div style="font-size:18px;font-weight:800;margin-bottom:6px">قسم "'+(names[name]||name)+'" قيد التطوير</div><div style="font-size:13px;color:var(--text-3);max-width:380px;margin:0 auto;line-height:1.6">هذا القسم من لوحة الإدارة جاهز للتطوير في المرحلة التالية.</div></div></div>';
 }
 
+/* ═══════════════════ VENDOR DASHBOARD ═══════════════════ */
+const VENDOR_CTX=INHOUSE; // logged-in vendor = the in-house main store
+const VNAV=[
+ {k:'dashboard',ar:'نظرة عامة',ic:'home'},
+ {k:'products',ar:'منتجاتي',ic:'bag'},
+ {k:'orders',ar:'طلباتي',ic:'receipt',badge:'5'},
+ {k:'analytics',ar:'التحليلات',ic:'trend'},
+ {k:'payouts',ar:'المدفوعات',ic:'card'},
+ {k:'settings',ar:'إعدادات المتجر',ic:'settings'},
+];
+function pageVendor(section){section=section||'dashboard';return '<div class="admin">'+vendorSidebar(section)+'<div class="amain">'+vendorTop()+vendorBody(section)+'</div></div>';}
+function vendorSidebar(section){
+ const v=vendorMeta[VENDOR_CTX]||{rating:4.9,inhouse:true};
+ return '<div class="asidebar">'+
+  '<div class="abrand">'+logoSVG(34)+'<div><div class="an">'+VENDOR_CTX+'</div><div class="as">VENDOR · لوحة البائع</div></div></div>'+
+  VNAV.map(n=>'<div class="anav'+(section===n.k?' on':'')+'" data-nav="#/vendor/'+n.k+'">'+ic(n.ic,{size:18})+'<span style="flex:1">'+n.ar+'</span>'+(n.badge?'<span class="abadge">'+n.badge+'</span>':'')+'</div>').join('')+
+  '<div class="aplan" style="background:linear-gradient(135deg,var(--gold-700),var(--gold-500));color:#2a1f08"><div style="font-size:11px;opacity:.85;font-weight:700;margin-bottom:6px">'+(v.inhouse?'البائع الرسمي · Official':'بائع معتمد')+'</div><div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:4px">'+ic('star',{size:15})+' تقييم '+v.rating+'</div></div>'+
+ '</div>';
+}
+function vendorTop(){
+ return '<div class="atop">'+
+  '<div><div style="font-size:11px;color:var(--text-3);font-weight:600">مرحباً بعودتك 👋</div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px">'+VENDOR_CTX+' '+(isInhouse(VENDOR_CTX)?'<span class="pill gold" style="font-size:10.5px">بائع رسمي</span>':'')+'</div></div>'+
+  '<div class="asearch" style="margin-inline-start:24px">'+ic('search',{size:16,color:'var(--text-3)'})+'<input placeholder="ابحث في منتجاتي وطلباتي…"></div>'+
+  '<div style="display:flex;gap:10px;align-items:center;margin-inline-start:auto">'+
+   '<a class="aback" data-nav="#/">'+ic('chevl',{size:14})+' المتجر</a>'+
+   '<button class="iconbtn" data-theme-toggle style="border:1px solid var(--border)">'+ic(theme==='dark'?'sun':'moon',{size:18})+'</button>'+
+   '<button class="iconbtn" style="border:1px solid var(--border);position:relative">'+ic('bell',{size:18})+'<span style="position:absolute;top:9px;inset-inline-end:9px;width:8px;height:8px;border-radius:50%;background:var(--terra-600);border:2px solid var(--bg)"></span></button>'+
+   '<div style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;background:var(--surface);border:1px solid var(--border);border-radius:999px"><div class="aavatar" style="width:30px;height:30px">'+VENDOR_CTX[0]+'</div><div style="font-size:12.5px;font-weight:700">'+VENDOR_CTX+'</div></div>'+
+  '</div>'+
+ '</div>';
+}
+function vendorBody(section){
+ if(section==='products')return vendorMyProducts();
+ if(section==='orders')return vendorMyOrders();
+ if(section==='payouts')return vendorPayouts();
+ if(section==='dashboard')return vendorOverview();
+ return adminPlaceholder(section);
+}
+function vendorOverview(){
+ const mine=vendorProducts(VENDOR_CTX);const myOrders=ADMIN_ORDERS.filter(o=>o.vendor===VENDOR_CTX);
+ const kpis=[
+  {l:'مبيعاتي هذا الشهر',v:'١٨٬٤٢٠',u:'ر.س',d:'+22%',up:1,c:'var(--primary)'},
+  {l:'طلبات جديدة',v:'٥',d:'+2',up:1,c:'var(--gold-700)'},
+  {l:'منتجاتي',v:''+mine.length,d:'نشط',up:1,c:'var(--terra-600)'},
+  {l:'رصيد المحفظة',v:'٩٬٢٤٠',u:'ر.س',d:'تحويل قريب',up:1,c:'var(--green-500)'},
+ ];
+ return '<div style="padding:24px">'+
+  '<div class="akpis">'+kpis.map(k=>'<div class="akpi"><div style="position:absolute;top:0;inset-inline-end:0;width:80px;height:80px;border-radius:50%;background:'+k.c+';opacity:.08;transform:translate(30%,-30%)"></div><div class="kl">'+k.l+'</div><div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px"><div class="kv">'+k.v+'</div>'+(k.u?'<div style="font-size:11px;color:var(--text-3);font-weight:700">'+k.u+'</div>':'')+'</div><div style="display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:'+(k.up?'var(--success)':'var(--danger)')+'"><span>'+(k.up?'↑':'↓')+'</span>'+k.d+'</div><svg viewBox="0 0 100 24" width="100%" height="24" style="margin-top:6px"><path d="M0 18 L12 14 L24 16 L36 10 L48 12 L60 6 L72 8 L84 4 L100 6" fill="none" stroke="'+k.c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 18 L12 14 L24 16 L36 10 L48 12 L60 6 L72 8 L84 4 L100 6 L100 24 L0 24 Z" fill="'+k.c+'" opacity="0.12"/></svg></div>').join('')+'</div>'+
+  '<div class="acards2">'+adminRevenue()+
+   '<div class="acard"><div style="font-size:14px;font-weight:800;margin-bottom:14px">منتجاتي الأكثر مبيعاً</div><div style="display:flex;flex-direction:column;gap:12px">'+mine.slice().sort((a,b)=>b.reviews-a.reviews).map((p,i)=>'<div style="display:flex;align-items:center;gap:12px"><div class="aprodimg">'+art(p.cat,null,'',p.img,80)+'</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.ar+'</div><div style="font-size:10.5px;color:var(--text-3)">'+p.reviews+' عملية بيع</div></div><div style="font-size:13px;font-weight:800;color:var(--primary)">'+p.price+' ر.س</div></div>').join('')+'</div></div>'+
+  '</div>'+
+  '<div class="acard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:14px;font-weight:800">أحدث طلباتي</div><a data-nav="#/vendor/orders" style="font-size:12px;color:var(--primary);font-weight:700;cursor:pointer">عرض الكل ←</a></div>'+
+   '<table class="atable"><thead><tr>'+['الطلب','العميل','المدينة','الحالة','الإجمالي'].map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+
+   myOrders.map(o=>'<tr><td style="font-weight:700">#'+o.id+'</td><td><div style="display:flex;align-items:center;gap:8px"><div class="aavatar">'+o.cust[0]+'</div><span style="font-weight:600">'+o.cust+'</span></div></td><td style="color:var(--text-3)">'+o.city+'</td><td><span class="pill '+AST[o.status][1]+'">'+AST[o.status][0]+'</span></td><td style="font-weight:700">'+o.total+' ر.س</td></tr>').join('')+
+   '</tbody></table></div>'+
+ '</div>';
+}
+function vendorMyProducts(){
+ const mine=vendorProducts(VENDOR_CTX);
+ return '<div style="padding:24px">'+
+  '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">منتجاتي</div><div style="font-size:12.5px;color:var(--text-3)">'+mine.length+' منتج في متجرك</div></div><button class="btn primary sm">'+ic('plus',{size:16,color:'#fff'})+' إضافة منتج</button></div>'+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['المنتج','القسم','السعر','المخزون','المبيعات','الحالة',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  mine.map(p=>{const gi=PRODUCTS.indexOf(p);const stock=STOCK[gi];return '<tr>'+
+    '<td style="padding:12px"><div style="display:flex;align-items:center;gap:10px"><div class="aprodimg">'+art(p.cat,null,'',p.img,80)+'</div><div><div style="font-weight:700">'+p.ar+'</div><div style="font-size:10.5px;color:var(--text-3)">SKU: SM-'+(1000+gi)+'</div></div></div></td>'+
+    '<td style="padding:12px;color:var(--text-2)">'+catName(p.cat)+'</td>'+
+    '<td style="padding:12px;font-weight:700">'+p.price+' ر.س</td>'+
+    '<td style="padding:12px"><div style="display:flex;align-items:center;gap:8px"><div style="width:60px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden"><div style="width:'+Math.min(100,stock)+'%;height:100%;background:'+(stock===0?'var(--danger)':stock<20?'var(--warning)':'var(--success)')+'"></div></div><span style="font-weight:700;font-size:12.5px">'+stock+'</span></div></td>'+
+    '<td style="padding:12px;font-weight:700">'+p.reviews+'</td>'+
+    '<td style="padding:12px"><span class="pill '+(stock===0?'danger':stock<20?'warn':'ok')+'">'+(stock===0?'نفذ':stock<20?'منخفض':'متوفر')+'</span></td>'+
+    '<td style="padding:12px"><div style="display:flex;gap:4px"><button class="aicon-btn">'+ic('edit',{size:14,color:'var(--text-2)'})+'</button><button class="aicon-btn">'+ic('more',{size:14,color:'var(--text-2)'})+'</button></div></td>'+
+   '</tr>';}).join('')+
+  '</tbody></table></div>'+
+ '</div>';
+}
+function vendorMyOrders(){
+ const myOrders=ADMIN_ORDERS.filter(o=>o.vendor===VENDOR_CTX);
+ const tabs=[['الكل',myOrders.length],['بانتظار الدفع',1],['مدفوع',1],['تم الشحن',1],['مكتمل',0]];
+ return '<div style="padding:24px">'+
+  '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">طلباتي</div><div style="font-size:12.5px;color:var(--text-3)">الطلبات الخاصة بمنتجاتك</div></div><button class="btn primary sm">'+ic('download',{size:16,color:'#fff'})+' تقرير</button></div>'+
+  '<div class="atabs">'+tabs.map((t,i)=>'<button class="atab'+(i===0?' on':'')+'">'+t[0]+'<span class="tn">'+t[1]+'</span></button>').join('')+'</div>'+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['الطلب','العميل','المدينة','العناصر','الإجمالي','الحالة','التاريخ',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  myOrders.map(o=>'<tr><td style="padding:14px;font-weight:800;color:var(--primary)">#'+o.id+'</td><td style="padding:14px"><div style="display:flex;align-items:center;gap:8px"><div class="aavatar">'+o.cust[0]+'</div><span style="font-weight:600">'+o.cust+'</span></div></td><td style="padding:14px;color:var(--text-2)">'+o.city+'</td><td style="padding:14px;font-weight:700">× '+o.items+'</td><td style="padding:14px;font-weight:800">'+o.total+' ر.س</td><td style="padding:14px"><span class="pill '+AST[o.status][1]+'">'+AST[o.status][0]+'</span></td><td style="padding:14px;color:var(--text-3);font-size:12px">'+o.date+'</td><td style="padding:14px"><button class="btn outline sm" style="padding:6px 12px;font-size:11.5px">تفاصيل</button></td></tr>').join('')+
+  '</tbody></table></div>'+
+ '</div>';
+}
+function vendorPayouts(){
+ const rows=[['PO-2041','١ مايو ٢٠٢٦','٨٬٧٢٠','مكتمل','ok'],['PO-2032','١ أبريل ٢٠٢٦','٧٬١٥٠','مكتمل','ok'],['PO-2025','١ مارس ٢٠٢٦','٦٬٤٨٠','مكتمل','ok']];
+ return '<div style="padding:24px">'+
+  '<div style="margin-bottom:18px"><div style="font-size:20px;font-weight:800">المدفوعات</div><div style="font-size:12.5px;color:var(--text-3)">أرصدتك وسجل التحويلات</div></div>'+
+  '<div class="akpis" style="grid-template-columns:repeat(3,1fr)"><div class="akpi"><div class="kl">الرصيد المتاح</div><div class="kv" style="color:var(--primary)">٩٬٢٤٠ <span style="font-size:12px;color:var(--text-3)">ر.س</span></div><button class="btn primary sm" style="margin-top:12px">طلب تحويل</button></div>'+
+   '<div class="akpi"><div class="kl">قيد المعالجة</div><div class="kv">١٬٤٨٠ <span style="font-size:12px;color:var(--text-3)">ر.س</span></div><div style="font-size:11.5px;color:var(--text-3);margin-top:8px">يُحوّل خلال ٣ أيام</div></div>'+
+   '<div class="akpi"><div class="kl">إجمالي الأرباح</div><div class="kv">١٤٢K <span style="font-size:12px;color:var(--text-3)">ر.س</span></div><div style="font-size:11.5px;color:var(--success);margin-top:8px;font-weight:700">عمولة المنصة: '+(vendorMeta[VENDOR_CTX]?vendorMeta[VENDOR_CTX].commission:0)+'٪</div></div></div>'+
+  '<div class="acard" style="padding:0;overflow-x:auto;margin-top:20px"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['رقم التحويل','التاريخ','المبلغ','الحالة'].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  rows.map(r=>'<tr><td style="padding:14px;font-weight:800;color:var(--primary)">'+r[0]+'</td><td style="padding:14px;color:var(--text-3)">'+r[1]+'</td><td style="padding:14px;font-weight:800">'+r[2]+' ر.س</td><td style="padding:14px"><span class="pill '+r[4]+'">'+r[3]+'</span></td></tr>').join('')+
+  '</tbody></table></div>'+
+ '</div>';
+}
+
 let heroTimer=null;
 function render(){
  clearInterval(heroTimer);
  const hash=location.hash||'#/';
  const parts=hash.slice(2).split('/'); // after '#/'
  const app=document.getElementById('app');
- // Admin is a full-screen view with its own chrome
- if(parts[0]==='admin'){
+ // Dashboards are full-screen views with their own chrome
+ if(parts[0]==='admin'||parts[0]==='vendor'){
    document.getElementById('topbar').innerHTML='';
    document.getElementById('footer').innerHTML='';
-   app.innerHTML=pageAdmin(parts[1]);
+   app.innerHTML=parts[0]==='admin'?pageAdmin(parts[1]):pageVendor(parts[1]);
    window.scrollTo(0,0);
    return;
  }
@@ -982,7 +1122,7 @@ function startHero(){
 /* ═══════════════════ EVENTS ═══════════════════ */
 function closeMega(){const m=document.getElementById('megamenu');if(m)m.classList.remove('open');document.querySelectorAll('[data-megatoggle]').forEach(b=>b.classList.remove('open'));}
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-nav],[data-add],[data-fav],[data-buy],[data-remove],[data-cq],[data-q],[data-grind],[data-rating],[data-pay],[data-dot],[data-theme-toggle],[data-coupon],[data-megatoggle]');
+ const t=e.target.closest('[data-nav],[data-add],[data-fav],[data-buy],[data-remove],[data-cq],[data-q],[data-grind],[data-rating],[data-vendor],[data-pay],[data-dot],[data-theme-toggle],[data-coupon],[data-megatoggle]');
  // close mega menu on any click outside it (and outside its toggle)
  if(!e.target.closest('#megamenu')&&!e.target.closest('[data-megatoggle]'))closeMega();
  if(!t)return;
@@ -999,6 +1139,7 @@ document.addEventListener('click',e=>{
  if(t.hasAttribute('data-q')){const op=t.getAttribute('data-q');pdState.qty=Math.max(1,pdState.qty+(op==='+'?1:-1));document.getElementById('qv').textContent=pdState.qty;return;}
  if(t.hasAttribute('data-grind')){pdState.grind=t.getAttribute('data-grind');document.querySelectorAll('[data-grind]').forEach(c=>c.classList.remove('active'));t.classList.add('active');return;}
  if(t.hasAttribute('data-rating')){shopState.minRating=parseFloat(t.getAttribute('data-rating'));render();return;}
+ if(t.hasAttribute('data-vendor')){shopState.vendor=t.getAttribute('data-vendor')||null;if((location.hash||'#/').indexOf('#/shop')!==0){nav('#/shop');}else{render();}return;}
  if(t.hasAttribute('data-pay')){document.querySelectorAll('[data-pay]').forEach(r=>r.classList.remove('on'));t.classList.add('on');return;}
  if(t.hasAttribute('data-dot')){const n=+t.getAttribute('data-dot');document.querySelectorAll('.hero-slide').forEach((s,k)=>s.classList.toggle('on',k===n));document.querySelectorAll('[data-dot]').forEach((d,k)=>d.classList.toggle('on',k===n));return;}
  if(t.hasAttribute('data-coupon')){const c=document.getElementById('coupon');toast(ic('gift',{size:18,color:'#7be0a8'})+(c&&c.value.trim()?'كود غير صالح — جرّب SUDAN10':'أدخل كود الخصم'));return;}

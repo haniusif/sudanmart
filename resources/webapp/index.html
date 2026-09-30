@@ -333,6 +333,47 @@ img,svg{display:block}
   .pd h1{font-size:22px}
 }
 .search-m{display:none}
+
+/* ═══════════════ Admin dashboard ═══════════════ */
+.admin{position:fixed;inset:0;display:grid;grid-template-columns:250px 1fr;background:var(--bg);color:var(--text);overflow:hidden}
+.asidebar{background:var(--bg-elev);border-inline-end:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.abrand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.abrand .an{font-size:14px;font-weight:800}
+.abrand .as{font-size:9.5px;color:var(--text-3);letter-spacing:1.5px;font-family:'Tajawal'}
+.anav{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text-2);transition:.12s}
+.anav:hover{background:var(--surface-2);color:var(--text)}
+.anav.on{background:var(--primary);color:var(--primary-ink)}
+.anav .abadge{margin-inline-start:auto;font-family:'Tajawal';font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--text-3)}
+.anav.on .abadge{background:rgba(255,255,255,.2);color:#fff}
+.aplan{margin-top:auto;padding:14px;background:linear-gradient(135deg,var(--primary),var(--green-700));border-radius:14px;color:#fff}
+.amain{overflow-y:auto;display:flex;flex-direction:column}
+.atop{display:flex;align-items:center;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:5}
+.asearch{flex:1;max-width:400px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 14px}
+.asearch input{flex:1;background:transparent;border:0;outline:none;font-family:inherit;font-size:13px;color:var(--text)}
+.akpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.akpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+.akpi .kl{font-size:12px;color:var(--text-3);font-weight:600;margin-bottom:6px}
+.akpi .kv{font-size:26px;font-weight:800;font-family:'Tajawal'}
+.acards2{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.acard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.acards3{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.atable{width:100%;border-collapse:collapse;font-size:12.5px}
+.atable th{padding:11px 8px;text-align:start;font-weight:700;color:var(--text-3);font-size:11px;border-bottom:1px solid var(--border)}
+.atable td{padding:12px 8px;border-bottom:1px solid var(--border)}
+.atable tbody tr:last-child td{border-bottom:0}
+.aavatar{width:28px;height:28px;border-radius:50%;background:var(--green-100);color:var(--primary);display:grid;place-items:center;font-weight:800;font-size:11px;flex-shrink:0}
+[data-theme='dark'] .aavatar{background:color-mix(in oklab,var(--primary) 30%,transparent);color:var(--gold-300)}
+.atabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.atab{background:transparent;border:0;padding:11px 14px;font-family:inherit;font-weight:600;color:var(--text-3);font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px}
+.atab.on{color:var(--text);font-weight:800;border-bottom-color:var(--primary)}
+.atab .tn{background:var(--surface-2);color:var(--text-3);font-size:10.5px;padding:2px 8px;border-radius:999px;font-family:'Tajawal';font-weight:700}
+.atab.on .tn{background:var(--primary);color:#fff}
+.aprodimg{width:40px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;position:relative}
+.aicon-btn{width:30px;height:30px;border:0;background:var(--surface-2);border-radius:8px;cursor:pointer;display:grid;place-items:center}
+.aicon-btn:hover{background:var(--surface-3)}
+.aback{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--text-3);cursor:pointer;padding:8px 12px;border-radius:10px;border:1px solid var(--border)}
+.aback:hover{background:var(--surface-2);color:var(--text)}
+@media(max-width:820px){.admin{grid-template-columns:1fr}.asidebar{display:none}.akpis{grid-template-columns:repeat(2,1fr)}.acards2,.acards3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -397,6 +438,8 @@ const FLASH=PRODUCTS.filter(p=>p.tag&&p.tag.startsWith('-'));
 const BEST=PRODUCTS.slice().sort((a,b)=>b.reviews-a.reviews).slice(0,10);
 const catName=c=>{const x=CATEGORIES.find(k=>k.cat===c);return x?x.ar:c};
 const byId=id=>PRODUCTS.find(p=>p.id===id);
+// Single-vendor: the whole store is one merchant
+const STORE={name:'سودان مارت',en:'Sudan Mart'};
 
 /* ═══════════════════ ICONS ═══════════════════ */
 function ic(name,o={}){
@@ -414,6 +457,13 @@ function ic(name,o={}){
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
   receipt:'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h4"/>',
   chev:'<path d="M15 6l-6 6 6 6"/>', chevl:'<path d="M9 6l6 6-6 6"/>', chevd:'<path d="M6 9l6 6 6-6"/>',
+  home:'<path d="M3 11l9-7 9 7v9a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .4 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.4 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .4-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.4-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.4H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.4 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2H4.5z"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+  download:'<path d="M12 3v12M7 11l5 5 5-5M5 21h14"/>',
+  edit:'<path d="M4 20h4l11-11-4-4L4 16zM14 6l4 4"/>',
+  more:'<circle cx="12" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="1.4" fill="currentColor" stroke="none"/>',
+  trend:'<path d="M3 17l6-6 4 4 8-9"/><path d="M14 6h7v7"/>',
   close:'<path d="M6 6l12 12M18 6L6 18"/>', check:'<path d="M5 12l4 4 10-10"/>',
   filter:'<path d="M3 5h18M6 12h12M10 19h4"/>', flame:'<path d="M12 3s4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-2.5C9 9 9 7 9 7s-2 2-2 5a5 5 0 0 0 10 0c0-5-5-9-5-9z"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', pin:'<path d="M12 22s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/>',
@@ -512,7 +562,7 @@ function pcard(p){
   '<div class="pbody">'+
    '<div class="pname">'+p.ar+'</div>'+
    '<div class="pen">'+p.en+'</div>'+
-   '<div class="pseller">'+ic('shield',{size:12,color:'var(--text-4)'})+p.seller+'</div>'+
+   '<div class="pseller">'+ic('shield',{size:12,color:'var(--text-4)'})+'منتج أصلي · شحن سريع</div>'+
    '<div class="prow">'+
     '<div><span class="price">'+money(p.price)+' <span class="cur">ر.س</span></span>'+(p.old?'<span class="price old">'+money(p.old)+'</span>':'')+'</div>'+
     '<button class="addb" data-add="'+p.id+'">'+ic('plus',{size:16})+'</button>'+
@@ -562,7 +612,7 @@ function footer(){
     '<div class="pays"><span class="pay">VISA</span><span class="pay">Mastercard</span><span class="pay">mada</span><span class="pay">Apple Pay</span><span class="pay">الدفع عند الاستلام</span></div>'+
    '</div>'+
    '<div><h5>تسوّق</h5>'+CATEGORIES.slice(0,6).map(c=>'<a data-nav="#/shop/'+c.cat+'">'+c.ar+'</a>').join('')+'</div>'+
-   '<div><h5>حسابي</h5><a data-nav="#/orders">طلباتي</a><a data-nav="#/favorites">المفضلة</a><a data-nav="#/cart">سلة التسوق</a><a data-nav="#/account">إعداداتي</a></div>'+
+   '<div><h5>حسابي</h5><a data-nav="#/orders">طلباتي</a><a data-nav="#/favorites">المفضلة</a><a data-nav="#/cart">سلة التسوق</a><a data-nav="#/account">إعداداتي</a><a data-nav="#/admin">لوحة الإدارة</a></div>'+
    '<div><h5>تواصل معنا</h5><a>'+ic('headset',{size:15})+' الدعم: 24/7</a><a>الأسئلة الشائعة</a><a>سياسة الإرجاع</a><a>الشحن والتوصيل</a><a>كن بائعاً معنا</a></div>'+
   '</div>'+
   '<div class="fbottom"><span>© ٢٠٢٦ سودان مارت — جميع الحقوق محفوظة</span><span class="en">Made with care · صُنع بحب للجالية السودانية</span></div>'+
@@ -615,7 +665,7 @@ function pageShop(cat){
  shopState.cat=cat||null;
  let list=PRODUCTS.slice();
  if(shopState.cat)list=list.filter(p=>p.cat===shopState.cat);
- if(shopState.q){const q=shopState.q.trim();list=list.filter(p=>(p.ar+p.en+p.seller).includes(q)||p.en.toLowerCase().includes(q.toLowerCase()))}
+ if(shopState.q){const q=shopState.q.trim();list=list.filter(p=>(p.ar+p.en).includes(q)||p.en.toLowerCase().includes(q.toLowerCase()))}
  list=list.filter(p=>p.price<=shopState.maxPrice&&p.rating>=shopState.minRating);
  const S={pop:(a,b)=>b.reviews-a.reviews,plow:(a,b)=>a.price-b.price,phigh:(a,b)=>b.price-a.price,rate:(a,b)=>b.rating-a.rating};
  list.sort(S[shopState.sort]);
@@ -655,7 +705,7 @@ function pageProduct(id){
     '<div class="thumbs">'+[0,1,2,3].map(i=>'<div class="thumb'+(i===0?' on':'')+'">'+art(p.cat,null,'',p.img,160)+'</div>').join('')+'</div>'+
    '</div>'+
    '<div>'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pill info">'+catName(p.cat)+'</span><span class="pseller" style="font-size:12.5px;color:var(--text-3)">'+ic('shield',{size:14,color:'var(--primary)'})+' '+p.seller+'</span></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pill info">'+catName(p.cat)+'</span><span class="pseller" style="font-size:12.5px;color:var(--text-3)">'+ic('shield',{size:14,color:'var(--primary)'})+' تُباع وتُشحن بواسطة '+STORE.name+'</span></div>'+
     '<h1>'+p.ar+'</h1><div class="pden">'+p.en+'</div>'+
     '<div style="display:flex;align-items:center;gap:10px"><div style="display:flex">'+stars(p.rating,17)+'</div><span style="font-weight:800">'+p.rating+'</span><span class="muted">('+p.reviews+' تقييم)</span></div>'+
     '<div class="pdprice"><span class="price">'+money(p.price)+' <span class="cur" style="font-size:16px">ر.س</span></span>'+(p.old?'<span class="price old" style="font-size:18px">'+money(p.old)+' ر.س</span><span class="pill danger">وفّر '+(p.old-p.price)+' ر.س</span>':'')+'</div>'+
@@ -677,7 +727,7 @@ function pageCart(){
  return '<div class="wrap fade"><h1 style="margin:26px 0 4px;font-size:26px">سلة التسوق</h1><div class="muted" style="margin-bottom:8px">'+cartCount()+' منتج في سلتك</div>'+
   '<div class="cartlay"><div>'+
    cart.map(it=>'<div class="citem"><div class="cart-art">'+art(it.p.cat,null,'',it.p.img,220)+'</div>'+
-     '<div class="cinfo"><div style="display:flex;justify-content:space-between;gap:10px"><div><div class="cname">'+it.p.ar+'</div><div class="copt">'+it.p.en+(it.opt.grind?' · '+it.opt.grind:'')+'</div><div class="copt">'+ic('shield',{size:12})+' '+it.p.seller+'</div></div><button class="iconbtn" data-remove="'+it.key+'" style="width:38px;height:38px" title="حذف">'+ic('trash',{size:18,color:'var(--danger)'})+'</button></div>'+
+     '<div class="cinfo"><div style="display:flex;justify-content:space-between;gap:10px"><div><div class="cname">'+it.p.ar+'</div><div class="copt">'+it.p.en+(it.opt.grind?' · '+it.opt.grind:'')+'</div><div class="copt">'+ic('shield',{size:12})+' '+STORE.name+'</div></div><button class="iconbtn" data-remove="'+it.key+'" style="width:38px;height:38px" title="حذف">'+ic('trash',{size:18,color:'var(--danger)'})+'</button></div>'+
      '<div class="cbot"><div class="qtybox"><button data-cq="'+it.key+'|-">'+ic('minus',{size:15})+'</button><span>'+it.qty+'</span><button data-cq="'+it.key+'|+">'+ic('plus',{size:15})+'</button></div><div class="price">'+money(it.p.price*it.qty)+' <span class="cur">ر.س</span></div></div>'+
      '</div></div>').join('')+
    '<button class="btn ghost" data-nav="#/shop" style="color:var(--primary)">'+ic('chevl',{size:16,color:'var(--primary)'})+' متابعة التسوق</button>'+
@@ -753,7 +803,7 @@ function pageAccount(){
  return '<div class="wrap fade"><h1 style="margin:26px 0 20px;font-size:26px">حسابي</h1>'+
   '<div class="card" style="padding:26px;display:flex;align-items:center;gap:18px;margin-bottom:20px"><div class="rav" style="width:70px;height:70px;font-size:26px;background:var(--primary);color:var(--primary-ink);border-radius:50%;display:grid;place-items:center;font-weight:800">م</div><div><div style="font-size:20px;font-weight:800">محمد أحمد</div><div class="muted">+966 55 ••• 4421 · الرياض</div><div style="margin-top:8px"><span class="pill gold">عضو ذهبي</span></div></div><button class="btn outline sm" style="margin-inline-start:auto">تعديل</button></div>'+
   '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">'+
-   [['receipt','طلباتي','٤ طلبات','#/orders'],['heart','المفضلة',favs.size+' منتج','#/favorites'],['pin','عناويني','٢ عنوان','#/account'],['bag','سلتي',cartCount()+' منتج','#/cart'],['gift','نقاط المكافآت','١٢٠ نقطة','#/account'],['globe','اللغة','العربية','#/account']]
+   [['receipt','طلباتي','٤ طلبات','#/orders'],['heart','المفضلة',favs.size+' منتج','#/favorites'],['settings','لوحة الإدارة','إدارة المتجر','#/admin'],['bag','سلتي',cartCount()+' منتج','#/cart'],['gift','نقاط المكافآت','١٢٠ نقطة','#/account'],['globe','اللغة','العربية','#/account']]
    .map(t=>'<div class="tb" data-nav="'+t[3]+'" style="cursor:pointer"><div class="tbic">'+ic(t[0],{size:22})+'</div><div><div class="tbt">'+t[1]+'</div><div class="tbs">'+t[2]+'</div></div></div>').join('')+
   '</div></div>';
 }
@@ -763,14 +813,145 @@ function emptyPage(icn,title,sub,goHash,btn){
 }
 
 /* ═══════════════════ ROUTER ═══════════════════ */
+/* ═══════════════════ ADMIN DASHBOARD ═══════════════════ */
+const ADMIN_KPIS=[
+ {l:'مبيعات اليوم',v:'٤٢٬٣٨٠',u:'ر.س',d:'+18%',up:1,c:'var(--primary)'},
+ {l:'طلبات اليوم',v:'٢٤٧',d:'+12%',up:1,c:'var(--gold-700)'},
+ {l:'عملاء جدد',v:'٤٢',d:'+24%',up:1,c:'var(--terra-600)'},
+ {l:'متوسط قيمة الطلب',v:'١٧١',u:'ر.س',d:'-3%',up:0,c:'var(--green-500)'},
+];
+const ADMIN_ORDERS=[
+ {id:'SM-8501',cust:'فاطمة المنصوري',items:3,total:248,status:'pending',city:'الرياض',date:'اليوم — ٠٩:٤٢'},
+ {id:'SM-8500',cust:'عبد الرحمن الشمري',items:2,total:124,status:'paid',city:'الرياض',date:'اليوم — ٠٩:١٨'},
+ {id:'SM-8499',cust:'مريم الخالد',items:5,total:386,status:'paid',city:'جدة',date:'اليوم — ٠٨:٣٢'},
+ {id:'SM-8498',cust:'محمد الحسن',items:1,total:95,status:'shipped',city:'الرياض',date:'أمس'},
+ {id:'SM-8497',cust:'سارة العنزي',items:4,total:165,status:'delivered',city:'مكة',date:'قبل يومين'},
+ {id:'SM-8496',cust:'إبراهيم النور',items:2,total:195,status:'pending',city:'المدينة',date:'اليوم'},
+];
+const STOCK=[42,8,156,23,0,67,92,12,38,71,54,19,88,33];
+const ADMIN_NAV=[
+ {k:'dashboard',ar:'الرئيسية',ic:'home'},
+ {k:'orders',ar:'الطلبات',ic:'receipt',badge:'12'},
+ {k:'products',ar:'المنتجات',ic:'bag',badge:''+PRODUCTS.length},
+ {k:'customers',ar:'العملاء',ic:'user'},
+ {k:'analytics',ar:'التحليلات',ic:'trend'},
+ {k:'promos',ar:'العروض والكوبونات',ic:'gift'},
+ {k:'reviews',ar:'المراجعات',ic:'star'},
+ {k:'settings',ar:'الإعدادات',ic:'settings'},
+];
+const AST={pending:['بانتظار الدفع','warn'],paid:['مدفوع','info'],shipped:['تم الشحن','gold'],delivered:['مكتمل','ok']};
+
+function pageAdmin(section){
+ section=section||'dashboard';
+ return '<div class="admin">'+adminSidebar(section)+'<div class="amain">'+adminTop()+adminBody(section)+'</div></div>';
+}
+function adminSidebar(section){
+ return '<div class="asidebar">'+
+  '<div class="abrand">'+logoSVG(34)+'<div><div class="an">سودان مارت</div><div class="as">ADMIN PANEL</div></div></div>'+
+  ADMIN_NAV.map(n=>'<div class="anav'+(section===n.k?' on':'')+'" data-nav="#/admin/'+n.k+'">'+ic(n.ic,{size:18})+'<span style="flex:1">'+n.ar+'</span>'+(n.badge?'<span class="abadge">'+n.badge+'</span>':'')+'</div>').join('')+
+  '<div class="aplan"><div style="font-size:11px;opacity:.75;font-weight:600;margin-bottom:6px">الباقة الذهبية</div><div style="font-size:13px;font-weight:800;margin-bottom:10px">٧٢٪ من السعة</div><div style="height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden"><div style="width:72%;height:100%;background:var(--accent)"></div></div></div>'+
+ '</div>';
+}
+function adminTop(){
+ return '<div class="atop">'+
+  '<div><div style="font-size:11px;color:var(--text-3);font-weight:600">أهلاً، أحمد 👋</div><div style="font-size:20px;font-weight:800">لوحة التحكم</div></div>'+
+  '<div class="asearch" style="margin-inline-start:24px">'+ic('search',{size:16,color:'var(--text-3)'})+'<input placeholder="ابحث عن طلب، منتج، عميل…"></div>'+
+  '<div style="display:flex;gap:10px;align-items:center;margin-inline-start:auto">'+
+   '<a class="aback" data-nav="#/">'+ic('chevl',{size:14})+' المتجر</a>'+
+   '<button class="iconbtn" data-theme-toggle title="المظهر" style="border:1px solid var(--border)">'+ic(theme==='dark'?'sun':'moon',{size:18})+'</button>'+
+   '<button class="iconbtn" style="border:1px solid var(--border);position:relative">'+ic('bell',{size:18})+'<span style="position:absolute;top:9px;inset-inline-end:9px;width:8px;height:8px;border-radius:50%;background:var(--terra-600);border:2px solid var(--bg)"></span></button>'+
+   '<div style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;background:var(--surface);border:1px solid var(--border);border-radius:999px"><div class="aavatar" style="width:30px;height:30px">أ</div><div style="font-size:12.5px;font-weight:700">أحمد م.</div></div>'+
+  '</div>'+
+ '</div>';
+}
+function adminBody(section){
+ if(section==='orders')return adminOrders();
+ if(section==='products')return adminProducts();
+ if(section==='dashboard')return adminOverview();
+ return adminPlaceholder(section);
+}
+function adminOverview(){
+ return '<div style="padding:24px">'+
+  '<div class="akpis">'+ADMIN_KPIS.map(k=>'<div class="akpi"><div style="position:absolute;top:0;inset-inline-end:0;width:80px;height:80px;border-radius:50%;background:'+k.c+';opacity:.08;transform:translate(30%,-30%)"></div><div class="kl">'+k.l+'</div><div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px"><div class="kv">'+k.v+'</div>'+(k.u?'<div style="font-size:11px;color:var(--text-3);font-weight:700">'+k.u+'</div>':'')+'</div><div style="display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:'+(k.up?'var(--success)':'var(--danger)')+'"><span>'+(k.up?'↑':'↓')+'</span>'+k.d+' <span style="color:var(--text-3);font-weight:600">هذا الأسبوع</span></div><svg viewBox="0 0 100 24" width="100%" height="24" style="margin-top:6px"><path d="M0 18 L12 14 L24 16 L36 10 L48 12 L60 6 L72 8 L84 4 L100 6" fill="none" stroke="'+k.c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 18 L12 14 L24 16 L36 10 L48 12 L60 6 L72 8 L84 4 L100 6 L100 24 L0 24 Z" fill="'+k.c+'" opacity="0.12"/></svg></div>').join('')+'</div>'+
+  '<div class="acards2">'+adminRevenue()+adminDonut()+'</div>'+
+  '<div class="acards3">'+adminRecent()+adminTop5()+'</div>'+
+ '</div>';
+}
+function adminRevenue(){
+ const data=[12,18,22,17,28,32,26,38,42,36,48,52],labels=['ينا','فبر','مار','أبر','ماي','يون','يول','أغس','سبت','أكت','نوف','ديس'],max=60;
+ return '<div class="acard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><div><div style="font-size:14px;font-weight:800">الإيرادات</div><div style="font-size:11.5px;color:var(--text-3)">السنة الحالية مقابل السابقة</div></div><div style="display:flex;gap:6px">'+['أسبوع','شهر','سنة'].map((p,i)=>'<span class="chip'+(i===2?' active':'')+'" style="padding:6px 12px;font-size:11.5px">'+p+'</span>').join('')+'</div></div>'+
+  '<div style="display:flex;align-items:flex-end;gap:7px;height:170px">'+data.map((v,i)=>'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end"><div style="width:100%;display:flex;align-items:flex-end;gap:2px;height:145px"><div style="flex:1;height:'+(v*0.7/max*100)+'%;background:var(--surface-3);border-radius:5px 5px 0 0"></div><div style="flex:1;height:'+(v/max*100)+'%;background:'+(i===11?'var(--accent)':'var(--primary)')+';border-radius:5px 5px 0 0"></div></div><div style="font-size:10px;color:var(--text-3)">'+labels[i]+'</div></div>').join('')+'</div>'+
+  '<div style="display:flex;gap:18px;margin-top:14px"><div style="display:flex;align-items:center;gap:6px;font-size:11.5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--primary)"></span>٢٠٢٦ <span style="color:var(--text-3)">٣٢٤K ر.س</span></div><div style="display:flex;align-items:center;gap:6px;font-size:11.5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--surface-3)"></span>٢٠٢٥ <span style="color:var(--text-3)">٢٥٨K ر.س</span></div></div>'+
+ '</div>';
+}
+function adminDonut(){
+ const cats=[{name:'بن وقهوة',pct:32,color:'#3D2418'},{name:'بهارات',pct:24,color:'#B0492C'},{name:'عطور',pct:18,color:'#1F2A26'},{name:'أزياء',pct:14,color:'#0F4D3A'},{name:'أخرى',pct:12,color:'#C9A24B'}];
+ let acc=0;const r=50,c=2*Math.PI*r;
+ const segs=cats.map(x=>{const start=acc;acc+=x.pct;const len=x.pct/100*c;return '<circle r="'+r+'" fill="none" stroke="'+x.color+'" stroke-width="18" stroke-dasharray="'+len+' '+(c-len)+'" stroke-dashoffset="'+(-(start/100*c))+'"/>';}).join('');
+ return '<div class="acard"><div style="font-size:14px;font-weight:800;margin-bottom:4px">المبيعات حسب القسم</div><div style="font-size:11.5px;color:var(--text-3);margin-bottom:16px">هذا الشهر</div>'+
+  '<div style="display:flex;justify-content:center;margin-bottom:18px"><svg viewBox="0 0 120 120" width="160" height="160"><g transform="translate(60 60) rotate(-90)">'+segs+'</g><text x="60" y="58" text-anchor="middle" font-size="11" fill="var(--text-3)" font-family="Tajawal">إجمالي</text><text x="60" y="76" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text)" font-family="Tajawal">١٬٢٤٨</text></svg></div>'+
+  '<div style="display:flex;flex-direction:column;gap:8px">'+cats.map(x=>'<div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="width:10px;height:10px;border-radius:3px;background:'+x.color+'"></span><span style="flex:1">'+x.name+'</span><span style="color:var(--text-3);font-weight:700">'+x.pct+'%</span></div>').join('')+'</div>'+
+ '</div>';
+}
+function adminRecent(){
+ return '<div class="acard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div><div style="font-size:14px;font-weight:800">أحدث الطلبات</div><div style="font-size:11.5px;color:var(--text-3)">آخر ٢٤ ساعة</div></div><a data-nav="#/admin/orders" style="font-size:12px;color:var(--primary);font-weight:700;cursor:pointer">عرض الكل ←</a></div>'+
+  '<table class="atable"><thead><tr>'+['الطلب','العميل','المدينة','الحالة','الإجمالي'].map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  ADMIN_ORDERS.slice(0,6).map(r=>'<tr><td style="font-weight:700">#'+r.id+'</td><td><div style="display:flex;align-items:center;gap:8px"><div class="aavatar">'+r.cust[0]+'</div><span style="font-weight:600">'+r.cust+'</span></div></td><td style="color:var(--text-3)">'+r.city+'</td><td><span class="pill '+AST[r.status][1]+'">'+AST[r.status][0]+'</span></td><td style="font-weight:700">'+r.total+' ر.س</td></tr>').join('')+
+  '</tbody></table></div>';
+}
+function adminTop5(){
+ return '<div class="acard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:14px;font-weight:800">الأكثر مبيعاً</div><a data-nav="#/admin/products" style="font-size:12px;color:var(--primary);font-weight:700;cursor:pointer">كل المنتجات</a></div>'+
+  '<div style="display:flex;flex-direction:column;gap:12px">'+BEST.slice(0,5).map((p,i)=>'<div style="display:flex;align-items:center;gap:12px"><div class="aprodimg">'+art(p.cat,null,'',p.img,80)+'</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.ar+'</div><div style="font-size:10.5px;color:var(--text-3)">'+p.reviews+' عملية بيع</div></div><div style="text-align:end"><div style="font-size:13px;font-weight:800;color:var(--primary)">'+((p.price*p.reviews/100)|0)+'K</div><div style="font-size:10.5px;color:var(--success);font-weight:700">+'+((i+1)*8)+'%</div></div></div>').join('')+'</div></div>';
+}
+function adminProducts(){
+ return '<div style="padding:24px">'+
+  '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">المنتجات</div><div style="font-size:12.5px;color:var(--text-3)">إجمالي '+PRODUCTS.length+' منتج · '+CATEGORIES.length+' أقسام</div></div><div style="display:flex;gap:10px"><button class="btn outline sm">'+ic('download',{size:16})+' تصدير</button><button class="btn primary sm">'+ic('plus',{size:16,color:'#fff'})+' منتج جديد</button></div></div>'+
+  '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div class="asearch" style="min-width:240px;max-width:280px">'+ic('search',{size:16,color:'var(--text-3)'})+'<input placeholder="ابحث عن منتج…"></div>'+['كل الأقسام','متوفر','تنبيه مخزون','مسودة'].map((c,i)=>'<span class="chip'+(i===0?' active':'')+'">'+c+'</span>').join('')+'</div>'+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['المنتج','القسم','السعر','المخزون','المبيعات','الحالة',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  PRODUCTS.map((p,i)=>{const stock=STOCK[i];return '<tr>'+
+    '<td style="padding:12px"><div style="display:flex;align-items:center;gap:10px"><div class="aprodimg">'+art(p.cat,null,'',p.img,80)+'</div><div><div style="font-weight:700">'+p.ar+'</div><div style="font-size:10.5px;color:var(--text-3)">SKU: SM-'+(1000+i)+'</div></div></div></td>'+
+    '<td style="padding:12px;color:var(--text-2)">'+catName(p.cat)+'</td>'+
+    '<td style="padding:12px;font-weight:700">'+p.price+' ر.س</td>'+
+    '<td style="padding:12px"><div style="display:flex;align-items:center;gap:8px"><div style="width:60px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden"><div style="width:'+Math.min(100,stock)+'%;height:100%;background:'+(stock===0?'var(--danger)':stock<20?'var(--warning)':'var(--success)')+'"></div></div><span style="font-weight:700;font-size:12.5px">'+stock+'</span></div></td>'+
+    '<td style="padding:12px;font-weight:700">'+p.reviews+'</td>'+
+    '<td style="padding:12px"><span class="pill '+(stock===0?'danger':stock<20?'warn':'ok')+'">'+(stock===0?'نفذ':stock<20?'منخفض':'متوفر')+'</span></td>'+
+    '<td style="padding:12px"><div style="display:flex;gap:4px"><button class="aicon-btn">'+ic('edit',{size:14,color:'var(--text-2)'})+'</button><button class="aicon-btn">'+ic('more',{size:14,color:'var(--text-2)'})+'</button></div></td>'+
+   '</tr>';}).join('')+
+  '</tbody></table></div>'+
+  '<div style="padding:14px 4px;display:flex;align-items:center;justify-content:space-between;font-size:12px"><div style="color:var(--text-3)">عرض ١ — '+PRODUCTS.length+' من '+PRODUCTS.length+'</div><div style="display:flex;gap:4px">'+['‹','1','2','3','›'].map(p=>'<button class="aicon-btn" style="width:30px;background:'+(p==='1'?'var(--primary)':'var(--surface)')+';color:'+(p==='1'?'#fff':'var(--text)')+';border:1px solid var(--border)">'+p+'</button>').join('')+'</div></div>'+
+ '</div>';
+}
+function adminOrders(){
+ const tabs=[['الكل',247],['بانتظار الدفع',18],['مدفوع',42],['تم الشحن',96],['مكتمل',91]];
+ return '<div style="padding:24px">'+
+  '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px"><div><div style="font-size:20px;font-weight:800">الطلبات</div><div style="font-size:12.5px;color:var(--text-3)">إدارة وتتبع جميع الطلبات</div></div><button class="btn primary sm">'+ic('download',{size:16,color:'#fff'})+' تقرير</button></div>'+
+  '<div class="atabs">'+tabs.map((t,i)=>'<button class="atab'+(i===0?' on':'')+'">'+t[0]+'<span class="tn">'+t[1]+'</span></button>').join('')+'</div>'+
+  '<div class="acard" style="padding:0;overflow-x:auto"><table class="atable"><thead style="background:var(--surface-2)"><tr>'+['الطلب','العميل','المدينة','العناصر','الإجمالي','الحالة','التاريخ',''].map(h=>'<th style="padding:14px 12px">'+h+'</th>').join('')+'</tr></thead><tbody>'+
+  ADMIN_ORDERS.map(o=>'<tr><td style="padding:14px;font-weight:800;color:var(--primary)">#'+o.id+'</td><td style="padding:14px"><div style="display:flex;align-items:center;gap:8px"><div class="aavatar">'+o.cust[0]+'</div><span style="font-weight:600">'+o.cust+'</span></div></td><td style="padding:14px;color:var(--text-2)">'+o.city+'</td><td style="padding:14px;font-weight:700">× '+o.items+'</td><td style="padding:14px;font-weight:800">'+o.total+' ر.س</td><td style="padding:14px"><span class="pill '+AST[o.status][1]+'">'+AST[o.status][0]+'</span></td><td style="padding:14px;color:var(--text-3);font-size:12px">'+o.date+'</td><td style="padding:14px"><button class="btn outline sm" style="padding:6px 12px;font-size:11.5px">تفاصيل</button></td></tr>').join('')+
+  '</tbody></table></div>'+
+ '</div>';
+}
+function adminPlaceholder(name){
+ const names={customers:'العملاء',analytics:'التحليلات',promos:'العروض والكوبونات',reviews:'المراجعات',settings:'الإعدادات'};
+ return '<div style="padding:24px"><div class="acard" style="padding:60px 24px;text-align:center"><div style="width:76px;height:76px;border-radius:22px;background:var(--surface-2);display:grid;place-items:center;margin:0 auto 16px">'+ic('settings',{size:36,color:'var(--text-3)'})+'</div><div style="font-size:18px;font-weight:800;margin-bottom:6px">قسم "'+(names[name]||name)+'" قيد التطوير</div><div style="font-size:13px;color:var(--text-3);max-width:380px;margin:0 auto;line-height:1.6">هذا القسم من لوحة الإدارة جاهز للتطوير في المرحلة التالية.</div></div></div>';
+}
+
 let heroTimer=null;
 function render(){
  clearInterval(heroTimer);
  const hash=location.hash||'#/';
  const parts=hash.slice(2).split('/'); // after '#/'
+ const app=document.getElementById('app');
+ // Admin is a full-screen view with its own chrome
+ if(parts[0]==='admin'){
+   document.getElementById('topbar').innerHTML='';
+   document.getElementById('footer').innerHTML='';
+   app.innerHTML=pageAdmin(parts[1]);
+   window.scrollTo(0,0);
+   return;
+ }
  document.getElementById('topbar').innerHTML=header();
  document.getElementById('footer').innerHTML=footer();
- const app=document.getElementById('app');
  let html='';
  if(parts[0]===''||parts[0]==='home')html=pageHome();
  else if(parts[0]==='shop')html=pageShop(parts[1]);
